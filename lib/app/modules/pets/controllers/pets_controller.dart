@@ -29,7 +29,7 @@ class PetsController extends GetxController {
         errorMessage(result.message ?? 'Gagal memuat data.');
       }
     } catch (e) {
-      errorMessage('Terjadi kesalahan: ${e.toString()}');
+      errorMessage('Gagal memuat daftar hewan, coba lagi.');
     } finally {
       isLoading(false);
     }
@@ -55,7 +55,7 @@ class PetsController extends GetxController {
         errorMessage(result.message ?? 'Gagal menghapus hewan.');
       }
     } catch (e) {
-      errorMessage('Terjadi kesalahan: ${e.toString()}');
+      errorMessage('Gagal menghapus hewan, coba lagi.');
     } finally {
       isLoading(false);
     }

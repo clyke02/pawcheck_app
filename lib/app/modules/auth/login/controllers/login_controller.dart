@@ -38,7 +38,7 @@ class LoginController extends GetxController {
         errorMessage(result.message ?? 'Login gagal.');
       }
     } catch (e) {
-      errorMessage('Terjadi kesalahan: ${e.toString()}');
+      errorMessage('Gagal login, mohon coba lagi.');
     } finally {
       isLoading(false);
     }

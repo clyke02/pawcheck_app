@@ -52,7 +52,7 @@ class AnalysisResultController extends GetxController {
         errorMessage(result.message ?? 'Gagal menyimpan hewan.');
       }
     } catch (e) {
-      errorMessage('Terjadi kesalahan: ${e.toString()}');
+      errorMessage('Gagal menyimpan hewan, mohon coba lagi.');
     } finally {
       isSaving(false);
     }

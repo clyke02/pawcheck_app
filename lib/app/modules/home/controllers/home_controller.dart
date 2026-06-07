@@ -28,7 +28,7 @@ class HomeController extends GetxController {
       final (u, _) = await authRepository.loadSaved();
       user.value = u;
     } catch (e) {
-      errorMessage('Terjadi kesalahan: ${e.toString()}');
+      errorMessage('Gagal memuat profil.');
     } finally {
       isLoading(false);
     }
@@ -49,7 +49,7 @@ class HomeController extends GetxController {
       await authRepository.logout();
       Get.offAllNamed(Routes.LOGIN);
     } catch (e) {
-      errorMessage('Terjadi kesalahan: ${e.toString()}');
+      errorMessage('Gagal keluar, mohon coba lagi.');
     } finally {
       isLoading(false);
     }

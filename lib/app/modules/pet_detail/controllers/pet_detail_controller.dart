@@ -41,7 +41,7 @@ class PetDetailController extends GetxController {
         errorMessage(result.message ?? 'Gagal memuat detail.');
       }
     } catch (e) {
-      errorMessage('Terjadi kesalahan: ${e.toString()}');
+      errorMessage('Gagal memuat detail hewan, coba lagi.');
     } finally {
       isLoading(false);
     }
@@ -73,7 +73,7 @@ class PetDetailController extends GetxController {
         errorMessage(result.message ?? 'Gagal memperbarui nama.');
       }
     } catch (e) {
-      errorMessage('Terjadi kesalahan: ${e.toString()}');
+      errorMessage('Gagal mengubah nama, coba lagi.');
     } finally {
       isLoading(false);
     }

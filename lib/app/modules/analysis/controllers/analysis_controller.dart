@@ -41,7 +41,7 @@ class AnalysisController extends GetxController {
       );
       if (picked != null) selectedImage.value = File(picked.path);
     } catch (e) {
-      errorMessage('Gagal memilih foto: ${e.toString()}');
+      errorMessage('Gagal membuka foto, coba lagi.');
     }
   }
 
@@ -127,7 +127,7 @@ class AnalysisController extends GetxController {
         errorMessage(result.message ?? 'Analisis gagal.');
       }
     } catch (e) {
-      errorMessage('Terjadi kesalahan: ${e.toString()}');
+      errorMessage('Analisis gagal, mohon coba lagi.');
     } finally {
       isLoading(false);
     }

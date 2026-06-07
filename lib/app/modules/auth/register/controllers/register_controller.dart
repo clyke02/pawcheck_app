@@ -45,7 +45,7 @@ class RegisterController extends GetxController {
         errorMessage(result.message ?? 'Registrasi gagal.');
       }
     } catch (e) {
-      errorMessage('Terjadi kesalahan: ${e.toString()}');
+      errorMessage('Gagal registrasi, mohon coba lagi.');
     } finally {
       isLoading(false);
     }
