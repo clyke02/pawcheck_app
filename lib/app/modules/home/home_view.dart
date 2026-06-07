@@ -45,17 +45,20 @@ class HomeView extends GetView<HomeController> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
-                  'Apa yang ingin kamu lakukan hari ini?',
-                  style: TextStyle(color: AppColors.textMedium),
-                ),
+                Obx(() => Text(
+                      controller.petsCount.value == 0
+                          ? 'Belum ada hewan peliharaan.'
+                          : 'Kamu punya ${controller.petsCount.value} hewan peliharaan.',
+                      style: const TextStyle(
+                          color: AppColors.textMedium, fontSize: 13),
+                    )),
                 const SizedBox(height: 32),
                 _MenuCard(
                   icon: Icons.camera_alt_rounded,
                   title: 'Analisis BCS',
                   subtitle: 'Foto hewan & cek kondisi tubuhnya',
                   color: AppColors.primary,
-                  onTap: () => Get.toNamed(Routes.analysis),
+                  onTap: () => Get.toNamed(Routes.ANALYSIS),
                 ),
                 const SizedBox(height: 16),
                 _MenuCard(
@@ -63,7 +66,7 @@ class HomeView extends GetView<HomeController> {
                   title: 'Hewan Peliharaan',
                   subtitle: 'Lihat & kelola daftar hewanmu',
                   color: AppColors.accent,
-                  onTap: () => Get.toNamed(Routes.pets),
+                  onTap: () => Get.toNamed(Routes.PETS),
                 ),
                 const SizedBox(height: 32),
                 Container(

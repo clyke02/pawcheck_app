@@ -5,7 +5,8 @@ import '../../data/models/pet_model.dart';
 import '../../data/repositories/pet_repository.dart';
 
 class PetsController extends GetxController {
-  final _repo = PetRepository();
+  final PetRepository repository;
+  PetsController({required this.repository});
 
   final pets = <PetModel>[].obs;
   final isLoading = false.obs;
@@ -29,7 +30,7 @@ class PetsController extends GetxController {
     try {
       isLoading(true);
       errorMessage('');
-      final result = await _repo.getPets();
+      final result = await repository.getPets();
       if (result.success) {
         pets.value = result.data ?? [];
       } else {
@@ -46,7 +47,7 @@ class PetsController extends GetxController {
     try {
       isLoading(true);
       errorMessage('');
-      final result = await _repo.createPet(name, analysisId);
+      final result = await repository.createPet(name, analysisId);
       if (result.success) {
         Get.snackbar(
           'Berhasil!',
@@ -72,7 +73,7 @@ class PetsController extends GetxController {
     try {
       isLoading(true);
       errorMessage('');
-      final result = await _repo.deletePet(id);
+      final result = await repository.deletePet(id);
       if (result.success) {
         pets.removeWhere((p) => p.id == id);
         Get.snackbar(
@@ -92,28 +93,5 @@ class PetsController extends GetxController {
     } finally {
       isLoading(false);
     }
-  }
-
-  void confirmDelete(PetModel pet) {
-    Get.dialog(
-      AlertDialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Hapus Hewan?'),
-        content: Text(
-            'Hapus ${pet.name}? Semua riwayat analisis juga akan terhapus.'),
-        actions: [
-          TextButton(onPressed: Get.back, child: const Text('Batal')),
-          TextButton(
-            onPressed: () {
-              Get.back();
-              deletePet(pet.id);
-            },
-            child: const Text('Hapus',
-                style: TextStyle(color: AppColors.error)),
-          ),
-        ],
-      ),
-    );
   }
 }

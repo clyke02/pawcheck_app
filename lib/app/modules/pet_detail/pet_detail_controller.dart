@@ -5,7 +5,8 @@ import '../../data/models/pet_model.dart';
 import '../../data/repositories/pet_repository.dart';
 
 class PetDetailController extends GetxController {
-  final _repo = PetRepository();
+  final PetRepository repository;
+  PetDetailController({required this.repository});
 
   final pet = Rxn<PetModel>();
   final isLoading = false.obs;
@@ -33,7 +34,7 @@ class PetDetailController extends GetxController {
     try {
       isLoading(true);
       errorMessage('');
-      final result = await _repo.getPet(id);
+      final result = await repository.getPet(id);
       if (result.success) {
         pet.value = result.data;
       } else {
@@ -55,7 +56,7 @@ class PetDetailController extends GetxController {
     try {
       isLoading(true);
       errorMessage('');
-      final result = await _repo.updatePet(pet.value!.id, name);
+      final result = await repository.updatePet(pet.value!.id, name);
       if (result.success) {
         pet.value = result.data;
         Get.back();
@@ -83,8 +84,8 @@ class PetDetailController extends GetxController {
     errorMessage('');
     Get.dialog(
       AlertDialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20)),
         title: const Text('Ubah Nama'),
         content: TextField(
           controller: nameCtrl,
@@ -98,8 +99,8 @@ class PetDetailController extends GetxController {
         actions: [
           TextButton(onPressed: Get.back, child: const Text('Batal')),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                minimumSize: const Size(80, 40)),
+            style:
+                ElevatedButton.styleFrom(minimumSize: const Size(80, 40)),
             onPressed: updateName,
             child: const Text('Simpan'),
           ),

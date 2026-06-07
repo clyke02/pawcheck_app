@@ -2,21 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:get/get.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../data/models/analysis_model.dart';
-import '../../routes/app_pages.dart';
 import '../../widgets/bcs_score_card.dart';
 import '../../widgets/paw_button.dart';
 import '../../widgets/paw_card.dart';
-import 'analysis_controller.dart';
+import '../../widgets/paw_loading_widget.dart';
+import 'analysis_result_controller.dart';
 
-class ResultView extends GetView<AnalysisController> {
+class ResultView extends GetView<AnalysisResultController> {
   const ResultView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      final result = controller.analysisResult.value;
-      if (result == null) return const SizedBox.shrink();
+      final result = controller.analysis.value;
+      if (result == null) {
+        return const Scaffold(body: PawLoadingWidget());
+      }
       return Scaffold(
         backgroundColor: AppColors.background,
         appBar: AppBar(
@@ -26,10 +27,7 @@ class ResultView extends GetView<AnalysisController> {
           automaticallyImplyLeading: false,
           actions: [
             TextButton(
-              onPressed: () {
-                controller.reset();
-                Get.offAllNamed(Routes.home);
-              },
+              onPressed: controller.done,
               child: const Text('Selesai'),
             ),
           ],
@@ -46,25 +44,25 @@ class ResultView extends GetView<AnalysisController> {
                 mer: result.mer,
               ),
               const SizedBox(height: 16),
-              _BreedChip(result: result),
+              _BreedChip(
+                breed: result.breedPrediction,
+                confidence: result.confidencePercent,
+              ),
               const SizedBox(height: 16),
               _InfoCard(result: result),
               const SizedBox(height: 16),
-              _NutritionCard(result: result),
+              _NutritionCard(nutritionRec: result.nutritionRecommendation),
               const SizedBox(height: 24),
               PawButton(
                 label: 'Simpan sebagai Hewan Peliharaan',
-                onTap: () => _showAddPetDialog(context, result),
+                onTap: controller.showSaveSheet,
                 icon: Icons.pets,
               ),
               const SizedBox(height: 12),
               PawButton(
                 label: 'Analisis Lagi',
                 isOutlined: true,
-                onTap: () {
-                  controller.reset();
-                  Get.back();
-                },
+                onTap: Get.back,
               ),
               const SizedBox(height: 24),
             ],
@@ -73,45 +71,12 @@ class ResultView extends GetView<AnalysisController> {
       );
     });
   }
-
-  void _showAddPetDialog(BuildContext context, AnalysisModel result) {
-    final nameCtrl = TextEditingController();
-    Get.dialog(
-      AlertDialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Beri Nama Hewanmu'),
-        content: TextField(
-          controller: nameCtrl,
-          decoration: const InputDecoration(labelText: 'Nama hewan'),
-          autofocus: true,
-        ),
-        actions: [
-          TextButton(onPressed: Get.back, child: const Text('Batal')),
-          ElevatedButton(
-            style:
-                ElevatedButton.styleFrom(minimumSize: const Size(80, 40)),
-            onPressed: () {
-              final name = nameCtrl.text.trim();
-              if (name.isEmpty) return;
-              Get.back();
-              Get.toNamed(Routes.pets, arguments: {
-                'createFromAnalysis': true,
-                'name': name,
-                'analysisId': result.id,
-              });
-            },
-            child: const Text('Simpan'),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _BreedChip extends StatelessWidget {
-  final AnalysisModel result;
-  const _BreedChip({required this.result});
+  final String breed;
+  final String confidence;
+  const _BreedChip({required this.breed, required this.confidence});
 
   @override
   Widget build(BuildContext context) {
@@ -127,10 +92,10 @@ class _BreedChip extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text('Prediksi Ras',
-                    style: TextStyle(
-                        fontSize: 11, color: AppColors.textMedium)),
+                    style:
+                        TextStyle(fontSize: 11, color: AppColors.textMedium)),
                 Text(
-                  result.breedPrediction,
+                  breed,
                   style: const TextStyle(
                       fontWeight: FontWeight.w700, fontSize: 14),
                 ),
@@ -145,7 +110,7 @@ class _BreedChip extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              result.confidencePercent,
+              confidence,
               style: const TextStyle(
                   color: AppColors.primary,
                   fontWeight: FontWeight.w700,
@@ -159,7 +124,7 @@ class _BreedChip extends StatelessWidget {
 }
 
 class _InfoCard extends StatelessWidget {
-  final AnalysisModel result;
+  final dynamic result;
   const _InfoCard({required this.result});
 
   @override
@@ -168,15 +133,16 @@ class _InfoCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Detail Pengukuran',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
-          ),
+          const Text('Detail Pengukuran',
+              style:
+                  TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
           const Divider(height: 20),
           _Row('Berat Aktual', '${result.weightKg} kg'),
           _Row('Berat Ideal', '${result.idealWeightUsed} kg'),
-          _Row('RER', '${result.rer.toStringAsFixed(0)} kkal/hari'),
-          _Row('MER', '${result.mer.toStringAsFixed(0)} kkal/hari'),
+          _Row('RER',
+              '${result.rer.toStringAsFixed(0)} kkal/hari'),
+          _Row('MER',
+              '${result.mer.toStringAsFixed(0)} kkal/hari'),
           _Row('Usia', '${result.ageYears} tahun'),
           _Row('Gender',
               result.gender == 'male' ? 'Jantan' : 'Betina'),
@@ -199,7 +165,8 @@ class _Row extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label,
-              style: const TextStyle(color: AppColors.textMedium)),
+              style:
+                  const TextStyle(color: AppColors.textMedium)),
           Text(value,
               style: const TextStyle(fontWeight: FontWeight.w600)),
         ],
@@ -209,13 +176,14 @@ class _Row extends StatelessWidget {
 }
 
 class _NutritionCard extends StatelessWidget {
-  final AnalysisModel result;
-  const _NutritionCard({required this.result});
+  final String? nutritionRec;
+  const _NutritionCard({required this.nutritionRec});
 
   @override
   Widget build(BuildContext context) {
-    final rec = result.nutritionRecommendation;
-    if (rec == null || rec.isEmpty) return const SizedBox.shrink();
+    if (nutritionRec == null || nutritionRec!.isEmpty) {
+      return const SizedBox.shrink();
+    }
     return PawCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,16 +193,14 @@ class _NutritionCard extends StatelessWidget {
               Icon(Icons.restaurant_rounded,
                   color: AppColors.primary, size: 18),
               SizedBox(width: 8),
-              Text(
-                'Rekomendasi Nutrisi',
-                style: TextStyle(
-                    fontWeight: FontWeight.w700, fontSize: 15),
-              ),
+              Text('Rekomendasi Nutrisi',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700, fontSize: 15)),
             ],
           ),
           const Divider(height: 20),
           MarkdownBody(
-            data: rec,
+            data: nutritionRec!,
             styleSheet: MarkdownStyleSheet(
               p: const TextStyle(
                   fontSize: 13, color: AppColors.textDark),

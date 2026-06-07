@@ -36,7 +36,7 @@ class PetsView extends GetView<PetsController> {
                 'Belum ada hewan peliharaan.\nAnalisis hewan untuk menyimpannya.',
             icon: Icons.pets,
             actionLabel: 'Mulai Analisis',
-            onAction: () => Get.toNamed(Routes.analysis),
+            onAction: () => Get.toNamed(Routes.ANALYSIS),
           );
         }
         return RefreshIndicator(
@@ -94,7 +94,7 @@ class PetsView extends GetView<PetsController> {
                 child: PetListCard(
                   pet: pet,
                   onTap: () =>
-                      Get.toNamed(Routes.petDetail, arguments: pet),
+                      Get.toNamed(Routes.PET_DETAIL, arguments: pet),
                 ),
               );
             },
@@ -103,7 +103,7 @@ class PetsView extends GetView<PetsController> {
       }),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
-        onPressed: () => Get.toNamed(Routes.analysis),
+        onPressed: () => Get.toNamed(Routes.ANALYSIS),
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );

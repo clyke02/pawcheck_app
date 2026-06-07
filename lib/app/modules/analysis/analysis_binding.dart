@@ -1,9 +1,13 @@
 import 'package:get/get.dart';
+import '../../data/repositories/analysis_repository.dart';
 import 'analysis_controller.dart';
 
 class AnalysisBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<AnalysisController>(() => AnalysisController());
+    Get.lazyPut<AnalysisRepository>(() => AnalysisRepository());
+    Get.lazyPut<AnalysisController>(
+      () => AnalysisController(repository: Get.find()),
+    );
   }
 }

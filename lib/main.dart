@@ -6,11 +6,14 @@ import 'core/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const PawCheckApp());
+  final (user, _) = await AuthRepository().loadSaved();
+  final initialRoute = user != null ? Routes.HOME : Routes.LOGIN;
+  runApp(PawCheckApp(initialRoute: initialRoute));
 }
 
 class PawCheckApp extends StatelessWidget {
-  const PawCheckApp({super.key});
+  final String initialRoute;
+  const PawCheckApp({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
@@ -18,35 +21,8 @@ class PawCheckApp extends StatelessWidget {
       title: 'PawCheck',
       theme: AppTheme.theme,
       debugShowCheckedModeBanner: false,
-      initialRoute: Routes.login,
+      initialRoute: initialRoute,
       getPages: AppPages.pages,
-      builder: (context, child) => _AuthGate(child: child!),
     );
   }
-}
-
-class _AuthGate extends StatefulWidget {
-  final Widget child;
-  const _AuthGate({required this.child});
-
-  @override
-  State<_AuthGate> createState() => _AuthGateState();
-}
-
-class _AuthGateState extends State<_AuthGate> {
-  @override
-  void initState() {
-    super.initState();
-    _checkAuth();
-  }
-
-  Future<void> _checkAuth() async {
-    final (user, _) = await AuthRepository().loadSaved();
-    if (user != null && Get.currentRoute == Routes.login) {
-      Get.offAllNamed(Routes.home);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) => widget.child;
 }

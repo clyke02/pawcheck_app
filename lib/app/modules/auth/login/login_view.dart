@@ -114,7 +114,7 @@ class LoginView extends GetView<LoginController> {
                   const Text('Belum punya akun? ',
                       style: TextStyle(color: AppColors.textMedium)),
                   GestureDetector(
-                    onTap: () => Get.toNamed(Routes.register),
+                    onTap: () => Get.toNamed(Routes.REGISTER),
                     child: const Text(
                       'Daftar',
                       style: TextStyle(

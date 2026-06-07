@@ -4,11 +4,13 @@ import '../../../data/repositories/auth_repository.dart';
 import '../../../routes/app_pages.dart';
 
 class RegisterController extends GetxController {
-  final _repo = AuthRepository();
+  final AuthRepository repository;
+  RegisterController({required this.repository});
 
   final nameCtrl = TextEditingController();
   final emailCtrl = TextEditingController();
   final passwordCtrl = TextEditingController();
+  final registerFormKey = GlobalKey<FormState>();
 
   final isLoading = false.obs;
   final errorMessage = ''.obs;
@@ -36,9 +38,9 @@ class RegisterController extends GetxController {
     try {
       isLoading(true);
       errorMessage('');
-      final result = await _repo.register(name, email, password);
+      final result = await repository.register(name, email, password);
       if (result.success) {
-        Get.offAllNamed(Routes.home);
+        Get.offAllNamed(Routes.HOME);
       } else {
         errorMessage(result.message ?? 'Registrasi gagal.');
       }

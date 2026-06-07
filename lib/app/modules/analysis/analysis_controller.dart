@@ -7,16 +7,23 @@ import '../../data/repositories/analysis_repository.dart';
 import '../../routes/app_pages.dart';
 
 class AnalysisController extends GetxController {
-  final _repo = AnalysisRepository();
+  final AnalysisRepository repository;
+  AnalysisController({required this.repository});
+
   final _picker = ImagePicker();
 
   final selectedImage = Rxn<File>();
   final weightCtrl = TextEditingController();
   final ageCtrl = TextEditingController();
   final selectedGender = 'male'.obs;
+
   final isLoading = false.obs;
+  final isPredicting = false.obs;
   final errorMessage = ''.obs;
+
   final analysisResult = Rxn<AnalysisModel>();
+  final predictedBreed = ''.obs;
+  final confidence = 0.0.obs;
 
   @override
   void onClose() {
@@ -105,7 +112,7 @@ class AnalysisController extends GetxController {
     }
     try {
       isLoading(true);
-      final result = await _repo.analyze(
+      final result = await repository.analyze(
         image: selectedImage.value!,
         weightKg: weight,
         ageYears: age,
@@ -113,7 +120,9 @@ class AnalysisController extends GetxController {
       );
       if (result.success) {
         analysisResult.value = result.data;
-        Get.toNamed(Routes.analysisResult);
+        predictedBreed.value = result.data?.breedPrediction ?? '';
+        confidence.value = result.data?.confidenceScore ?? 0.0;
+        Get.toNamed(Routes.ANALYSIS_RESULT, arguments: result.data);
       } else {
         errorMessage(result.message ?? 'Analisis gagal.');
       }
@@ -130,6 +139,8 @@ class AnalysisController extends GetxController {
     ageCtrl.clear();
     selectedGender.value = 'male';
     analysisResult.value = null;
+    predictedBreed.value = '';
+    confidence.value = 0.0;
     errorMessage('');
   }
 }

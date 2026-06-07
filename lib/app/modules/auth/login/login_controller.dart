@@ -4,10 +4,12 @@ import '../../../data/repositories/auth_repository.dart';
 import '../../../routes/app_pages.dart';
 
 class LoginController extends GetxController {
-  final _repo = AuthRepository();
+  final AuthRepository repository;
+  LoginController({required this.repository});
 
   final emailCtrl = TextEditingController();
   final passwordCtrl = TextEditingController();
+  final loginFormKey = GlobalKey<FormState>();
 
   final isLoading = false.obs;
   final errorMessage = ''.obs;
@@ -29,9 +31,9 @@ class LoginController extends GetxController {
     try {
       isLoading(true);
       errorMessage('');
-      final result = await _repo.login(email, password);
+      final result = await repository.login(email, password);
       if (result.success) {
-        Get.offAllNamed(Routes.home);
+        Get.offAllNamed(Routes.HOME);
       } else {
         errorMessage(result.message ?? 'Login gagal.');
       }

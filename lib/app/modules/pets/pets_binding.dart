@@ -1,9 +1,13 @@
 import 'package:get/get.dart';
+import '../../data/repositories/pet_repository.dart';
 import 'pets_controller.dart';
 
 class PetsBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<PetsController>(() => PetsController());
+    Get.lazyPut<PetRepository>(() => PetRepository());
+    Get.lazyPut<PetsController>(
+      () => PetsController(repository: Get.find()),
+    );
   }
 }
