@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../widgets/paw_button.dart';
+import '../../../widgets/paw_text_field.dart';
 import 'register_controller.dart';
 
 class RegisterView extends GetView<RegisterController> {
@@ -9,7 +11,12 @@ class RegisterView extends GetView<RegisterController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Buat Akun')),
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: const Text('Buat Akun'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -29,43 +36,63 @@ class RegisterView extends GetView<RegisterController> {
                 style: TextStyle(fontSize: 14, color: AppColors.textMedium),
               ),
               const SizedBox(height: 32),
-              TextField(
+              PawTextField(
                 controller: controller.nameCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Nama Lengkap',
-                  prefixIcon: Icon(Icons.person_outline),
-                ),
+                label: 'Nama Lengkap',
+                prefixIcon: Icons.person_outline,
               ),
-              const SizedBox(height: 16),
-              TextField(
+              const SizedBox(height: 14),
+              PawTextField(
                 controller: controller.emailCtrl,
+                label: 'Email',
                 keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  prefixIcon: Icon(Icons.email_outlined),
-                ),
+                prefixIcon: Icons.email_outlined,
               ),
-              const SizedBox(height: 16),
-              Obx(() => TextField(
-                    controller: controller.passwordCtrl,
-                    obscureText: controller.obscurePassword.value,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      prefixIcon: const Icon(Icons.lock_outline),
-                      suffixIcon: IconButton(
-                        icon: Icon(controller.obscurePassword.value
-                            ? Icons.visibility_off
-                            : Icons.visibility),
-                        onPressed: () => controller.obscurePassword.toggle(),
+              const SizedBox(height: 14),
+              PawTextField(
+                controller: controller.passwordCtrl,
+                label: 'Password',
+                obscureText: true,
+                prefixIcon: Icons.lock_outline,
+              ),
+              const SizedBox(height: 12),
+              Obx(() {
+                if (controller.errorMessage.value.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                return Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(bottom: 4),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.error.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                        color: AppColors.error.withValues(alpha: 0.3)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.error_outline,
+                          color: AppColors.error, size: 16),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          controller.errorMessage.value,
+                          style: const TextStyle(
+                              color: AppColors.error, fontSize: 13),
+                        ),
                       ),
-                    ),
-                  )),
-              const SizedBox(height: 32),
-              Obx(() => ElevatedButton(
-                    onPressed: controller.isLoading.value ? null : controller.register,
-                    child: controller.isLoading.value
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('Daftar'),
+                    ],
+                  ),
+                );
+              }),
+              const SizedBox(height: 16),
+              Obx(() => PawButton(
+                    label: 'Daftar',
+                    isLoading: controller.isLoading.value,
+                    onTap: controller.register,
+                    icon: Icons.person_add_rounded,
                   )),
               const SizedBox(height: 16),
               Center(

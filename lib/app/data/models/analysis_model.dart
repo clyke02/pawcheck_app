@@ -1,3 +1,5 @@
+import 'pet_model.dart';
+
 class AnalysisModel {
   final int id;
   final int? petId;
@@ -14,6 +16,7 @@ class AnalysisModel {
   final double mer;
   final String? nutritionRecommendation;
   final DateTime createdAt;
+  final PetModel? pet;
 
   AnalysisModel({
     required this.id,
@@ -31,24 +34,34 @@ class AnalysisModel {
     required this.mer,
     this.nutritionRecommendation,
     required this.createdAt,
+    this.pet,
   });
 
   factory AnalysisModel.fromJson(Map<String, dynamic> json) => AnalysisModel(
-        id: json['id'],
-        petId: json['pet_id'],
-        imageUrl: json['image_url'],
-        weightKg: double.parse(json['weight_kg'].toString()),
-        ageYears: double.parse(json['age_years'].toString()),
-        gender: json['gender'],
-        breedPrediction: json['breed_prediction'],
-        confidenceScore: double.parse(json['confidence_score'].toString()),
-        idealWeightUsed: double.parse(json['ideal_weight_used'].toString()),
-        bcsScore: json['bcs_score'],
-        bcsCategory: json['bcs_category'],
-        rer: double.parse(json['rer'].toString()),
-        mer: double.parse(json['mer'].toString()),
-        nutritionRecommendation: json['nutrition_recommendation'],
-        createdAt: DateTime.parse(json['created_at']),
+        id: json['id'] as int? ?? 0,
+        petId: json['pet_id'] as int?,
+        imageUrl: json['image_url'] as String? ?? '',
+        weightKg:
+            double.tryParse(json['weight_kg']?.toString() ?? '') ?? 0.0,
+        ageYears:
+            double.tryParse(json['age_years']?.toString() ?? '') ?? 0.0,
+        gender: json['gender'] as String? ?? 'male',
+        breedPrediction: json['breed_prediction'] as String? ?? '',
+        confidenceScore:
+            double.tryParse(json['confidence_score']?.toString() ?? '') ?? 0.0,
+        idealWeightUsed:
+            double.tryParse(json['ideal_weight_used']?.toString() ?? '') ?? 0.0,
+        bcsScore: json['bcs_score'] as int? ?? 3,
+        bcsCategory: json['bcs_category'] as String? ?? '',
+        rer: double.tryParse(json['rer']?.toString() ?? '') ?? 0.0,
+        mer: double.tryParse(json['mer']?.toString() ?? '') ?? 0.0,
+        nutritionRecommendation: json['nutrition_recommendation'] as String?,
+        createdAt: json['created_at'] != null
+            ? DateTime.tryParse(json['created_at'] as String) ?? DateTime.now()
+            : DateTime.now(),
+        pet: json['pet'] != null
+            ? PetModel.fromJson(json['pet'] as Map<String, dynamic>)
+            : null,
       );
 
   String get bcsEmoji {
@@ -64,4 +77,16 @@ class AnalysisModel {
 
   String get confidencePercent =>
       '${(confidenceScore * 100).toStringAsFixed(1)}%';
+
+  String get genderLabel => gender == 'male' ? 'Jantan' : 'Betina';
+
+  String get timeAgo {
+    final diff = DateTime.now().difference(createdAt);
+    if (diff.inDays >= 365) return '${(diff.inDays / 365).floor()} tahun lalu';
+    if (diff.inDays >= 30) return '${(diff.inDays / 30).floor()} bulan lalu';
+    if (diff.inDays >= 1) return '${diff.inDays} hari lalu';
+    if (diff.inHours >= 1) return '${diff.inHours} jam lalu';
+    if (diff.inMinutes >= 1) return '${diff.inMinutes} menit lalu';
+    return 'Baru saja';
+  }
 }

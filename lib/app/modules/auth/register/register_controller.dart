@@ -5,11 +5,13 @@ import '../../../routes/app_pages.dart';
 
 class RegisterController extends GetxController {
   final _repo = AuthRepository();
+
   final nameCtrl = TextEditingController();
   final emailCtrl = TextEditingController();
   final passwordCtrl = TextEditingController();
+
   final isLoading = false.obs;
-  final obscurePassword = true.obs;
+  final errorMessage = ''.obs;
 
   @override
   void onClose() {
@@ -24,24 +26,26 @@ class RegisterController extends GetxController {
     final email = emailCtrl.text.trim();
     final password = passwordCtrl.text;
     if (name.isEmpty || email.isEmpty || password.isEmpty) {
-      Get.snackbar('Error', 'Semua field wajib diisi.',
-          backgroundColor: Colors.red[100]);
+      errorMessage('Semua field wajib diisi.');
       return;
     }
     if (password.length < 8) {
-      Get.snackbar('Error', 'Password minimal 8 karakter.',
-          backgroundColor: Colors.red[100]);
+      errorMessage('Password minimal 8 karakter.');
       return;
     }
-    isLoading.value = true;
     try {
-      await _repo.register(name, email, password);
-      Get.offAllNamed(Routes.home);
+      isLoading(true);
+      errorMessage('');
+      final result = await _repo.register(name, email, password);
+      if (result.success) {
+        Get.offAllNamed(Routes.home);
+      } else {
+        errorMessage(result.message ?? 'Registrasi gagal.');
+      }
     } catch (e) {
-      Get.snackbar('Registrasi Gagal', e.toString(),
-          backgroundColor: Colors.red[100]);
+      errorMessage('Terjadi kesalahan: ${e.toString()}');
     } finally {
-      isLoading.value = false;
+      isLoading(false);
     }
   }
 }

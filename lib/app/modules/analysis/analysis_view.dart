@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../widgets/gender_toggle.dart';
+import '../../widgets/paw_button.dart';
+import '../../widgets/paw_loading_widget.dart';
+import '../../widgets/paw_text_field.dart';
 import 'analysis_controller.dart';
 
 class AnalysisView extends GetView<AnalysisController> {
@@ -9,9 +13,18 @@ class AnalysisView extends GetView<AnalysisController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Analisis BCS')),
-      body: SafeArea(
-        child: SingleChildScrollView(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: const Text('Analisis BCS'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const PawLoadingWidget(
+              message: 'Sedang menganalisis...\nMohon tunggu sebentar.');
+        }
+        return SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,8 +57,11 @@ class AnalysisView extends GetView<AnalysisController> {
                                 Icon(Icons.add_a_photo_rounded,
                                     size: 48, color: AppColors.primary),
                                 SizedBox(height: 8),
-                                Text('Tap untuk menambah foto',
-                                    style: TextStyle(color: AppColors.textMedium)),
+                                Text(
+                                  'Tap untuk menambah foto',
+                                  style: TextStyle(
+                                      color: AppColors.textMedium),
+                                ),
                               ],
                             ),
                     ),
@@ -53,104 +69,80 @@ class AnalysisView extends GetView<AnalysisController> {
               const SizedBox(height: 24),
               const Text(
                 'Data Hewan',
-                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                style:
+                    TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
               ),
               const SizedBox(height: 12),
-              TextField(
+              PawTextField(
                 controller: controller.weightCtrl,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(
-                  labelText: 'Berat (kg)',
-                  prefixIcon: Icon(Icons.monitor_weight_outlined),
-                ),
+                label: 'Berat (kg)',
+                keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true),
+                prefixIcon: Icons.monitor_weight_outlined,
               ),
               const SizedBox(height: 14),
-              TextField(
+              PawTextField(
                 controller: controller.ageCtrl,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(
-                  labelText: 'Usia (tahun)',
-                  prefixIcon: Icon(Icons.cake_outlined),
-                ),
+                label: 'Usia (tahun)',
+                keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true),
+                prefixIcon: Icons.cake_outlined,
               ),
               const SizedBox(height: 14),
-              const Text('Jenis Kelamin',
-                  style: TextStyle(
-                      fontWeight: FontWeight.w600, color: AppColors.textMedium)),
+              const Text(
+                'Jenis Kelamin',
+                style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textMedium),
+              ),
               const SizedBox(height: 8),
-              Obx(() => Row(
+              Obx(() => GenderToggle(
+                    selected: controller.selectedGender.value,
+                    onChanged: (v) => controller.selectedGender.value = v,
+                  )),
+              const SizedBox(height: 16),
+              Obx(() {
+                if (controller.errorMessage.value.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                return Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.error.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                        color: AppColors.error.withValues(alpha: 0.3)),
+                  ),
+                  child: Row(
                     children: [
-                      _GenderChip(
-                        label: 'Jantan ♂️',
-                        selected: controller.selectedGender.value == 'male',
-                        onTap: () => controller.selectedGender.value = 'male',
-                      ),
-                      const SizedBox(width: 12),
-                      _GenderChip(
-                        label: 'Betina ♀️',
-                        selected: controller.selectedGender.value == 'female',
-                        onTap: () => controller.selectedGender.value = 'female',
+                      const Icon(Icons.error_outline,
+                          color: AppColors.error, size: 16),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          controller.errorMessage.value,
+                          style: const TextStyle(
+                              color: AppColors.error, fontSize: 13),
+                        ),
                       ),
                     ],
-                  )),
-              const SizedBox(height: 32),
-              Obx(() => ElevatedButton.icon(
-                    onPressed:
-                        controller.isLoading.value ? null : controller.analyze,
-                    icon: controller.isLoading.value
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                                color: Colors.white, strokeWidth: 2),
-                          )
-                        : const Icon(Icons.analytics_rounded),
-                    label: Text(controller.isLoading.value
-                        ? 'Menganalisis...'
-                        : 'Analisis Sekarang'),
-                  )),
+                  ),
+                );
+              }),
+              const SizedBox(height: 8),
+              PawButton(
+                label: 'Analisis Sekarang',
+                onTap: controller.analyze,
+                icon: Icons.analytics_rounded,
+              ),
+              const SizedBox(height: 24),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _GenderChip extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _GenderChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.primary : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: selected ? AppColors.primary : const Color(0xFFE0E0E0),
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: selected ? Colors.white : AppColors.textMedium,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
+        );
+      }),
     );
   }
 }

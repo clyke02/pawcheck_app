@@ -15,7 +15,7 @@ class AnalysisController extends GetxController {
   final ageCtrl = TextEditingController();
   final selectedGender = 'male'.obs;
   final isLoading = false.obs;
-
+  final errorMessage = ''.obs;
   final analysisResult = Rxn<AnalysisModel>();
 
   @override
@@ -26,18 +26,22 @@ class AnalysisController extends GetxController {
   }
 
   Future<void> pickImage(ImageSource source) async {
-    final picked = await _picker.pickImage(
-      source: source,
-      imageQuality: 85,
-      maxWidth: 1080,
-    );
-    if (picked != null) selectedImage.value = File(picked.path);
+    try {
+      final picked = await _picker.pickImage(
+        source: source,
+        imageQuality: 85,
+        maxWidth: 1080,
+      );
+      if (picked != null) selectedImage.value = File(picked.path);
+    } catch (e) {
+      errorMessage('Gagal memilih foto: ${e.toString()}');
+    }
   }
 
   void showImageSourceDialog() {
     Get.bottomSheet(
       Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -45,12 +49,23 @@ class AnalysisController extends GetxController {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
             const Text('Pilih Sumber Foto',
                 style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             ListTile(
               leading: const Icon(Icons.camera_alt_rounded),
               title: const Text('Kamera'),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
               onTap: () {
                 Get.back();
                 pickImage(ImageSource.camera);
@@ -59,6 +74,8 @@ class AnalysisController extends GetxController {
             ListTile(
               leading: const Icon(Icons.photo_library_rounded),
               title: const Text('Galeri'),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
               onTap: () {
                 Get.back();
                 pickImage(ImageSource.gallery);
@@ -71,33 +88,39 @@ class AnalysisController extends GetxController {
   }
 
   Future<void> analyze() async {
+    errorMessage('');
     if (selectedImage.value == null) {
-      Get.snackbar('Error', 'Pilih foto terlebih dahulu.',
-          backgroundColor: Colors.red[100]);
+      errorMessage('Pilih foto terlebih dahulu.');
       return;
     }
     final weight = double.tryParse(weightCtrl.text.trim());
     final age = double.tryParse(ageCtrl.text.trim());
-    if (weight == null || age == null) {
-      Get.snackbar('Error', 'Berat dan usia harus berupa angka.',
-          backgroundColor: Colors.red[100]);
+    if (weight == null || weight <= 0) {
+      errorMessage('Masukkan berat badan yang valid.');
       return;
     }
-    isLoading.value = true;
+    if (age == null || age < 0) {
+      errorMessage('Masukkan usia yang valid.');
+      return;
+    }
     try {
+      isLoading(true);
       final result = await _repo.analyze(
         image: selectedImage.value!,
         weightKg: weight,
         ageYears: age,
         gender: selectedGender.value,
       );
-      analysisResult.value = result;
-      Get.toNamed(Routes.analysisResult);
+      if (result.success) {
+        analysisResult.value = result.data;
+        Get.toNamed(Routes.analysisResult);
+      } else {
+        errorMessage(result.message ?? 'Analisis gagal.');
+      }
     } catch (e) {
-      Get.snackbar('Analisis Gagal', e.toString(),
-          backgroundColor: Colors.red[100]);
+      errorMessage('Terjadi kesalahan: ${e.toString()}');
     } finally {
-      isLoading.value = false;
+      isLoading(false);
     }
   }
 
@@ -107,5 +130,6 @@ class AnalysisController extends GetxController {
     ageCtrl.clear();
     selectedGender.value = 'male';
     analysisResult.value = null;
+    errorMessage('');
   }
 }

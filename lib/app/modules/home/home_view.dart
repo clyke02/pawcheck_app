@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../routes/app_pages.dart';
+import '../../widgets/paw_loading_widget.dart';
 import 'home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
@@ -10,89 +11,100 @@ class HomeView extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('PawCheck'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: controller.logout,
-          ),
+          Obx(() => controller.isLoading.value
+              ? const SizedBox.shrink()
+              : IconButton(
+                  icon: const Icon(Icons.logout_rounded),
+                  tooltip: 'Keluar',
+                  onPressed: controller.logout,
+                )),
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Obx(() => Text(
-                    'Halo, ${controller.user.value?.name ?? ''}! 👋',
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.textDark,
-                    ),
-                  )),
-              const SizedBox(height: 4),
-              const Text(
-                'Apa yang ingin kamu lakukan hari ini?',
-                style: TextStyle(color: AppColors.textMedium),
-              ),
-              const SizedBox(height: 32),
-              _MenuCard(
-                icon: Icons.camera_alt_rounded,
-                title: 'Analisis BCS',
-                subtitle: 'Foto hewan & cek kondisi tubuhnya',
-                color: AppColors.primary,
-                onTap: () => Get.toNamed(Routes.analysis),
-              ),
-              const SizedBox(height: 16),
-              _MenuCard(
-                icon: Icons.pets,
-                title: 'Hewan Peliharaan',
-                subtitle: 'Lihat & kelola daftar hewanmu',
-                color: AppColors.accent,
-                onTap: () => Get.toNamed(Routes.pets),
-              ),
-              const SizedBox(height: 32),
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: AppColors.secondary,
-                  borderRadius: BorderRadius.circular(20),
+        child: Obx(() {
+          if (controller.isLoading.value) {
+            return const PawLoadingWidget(message: 'Memuat...');
+          }
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Halo, ${controller.user.value?.name ?? ''}! 👋',
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textDark,
+                  ),
                 ),
-                child: const Row(
-                  children: [
-                    Text('🐾', style: TextStyle(fontSize: 36)),
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Body Condition Score',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 15,
+                const SizedBox(height: 4),
+                const Text(
+                  'Apa yang ingin kamu lakukan hari ini?',
+                  style: TextStyle(color: AppColors.textMedium),
+                ),
+                const SizedBox(height: 32),
+                _MenuCard(
+                  icon: Icons.camera_alt_rounded,
+                  title: 'Analisis BCS',
+                  subtitle: 'Foto hewan & cek kondisi tubuhnya',
+                  color: AppColors.primary,
+                  onTap: () => Get.toNamed(Routes.analysis),
+                ),
+                const SizedBox(height: 16),
+                _MenuCard(
+                  icon: Icons.pets,
+                  title: 'Hewan Peliharaan',
+                  subtitle: 'Lihat & kelola daftar hewanmu',
+                  color: AppColors.accent,
+                  onTap: () => Get.toNamed(Routes.pets),
+                ),
+                const SizedBox(height: 32),
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: AppColors.secondary,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Row(
+                    children: [
+                      Text('🐾', style: TextStyle(fontSize: 36)),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Body Condition Score',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 15,
+                              ),
                             ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            'BCS mengukur kondisi ideal tubuh hewanmu dari skala 1-5 berdasarkan berat & ras.',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textMedium,
+                            SizedBox(height: 4),
+                            Text(
+                              'BCS mengukur kondisi ideal tubuh hewanmu dari skala 1-5 berdasarkan berat & ras.',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textMedium,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ),
+              ],
+            ),
+          );
+        }),
       ),
     );
   }

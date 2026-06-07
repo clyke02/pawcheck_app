@@ -5,7 +5,10 @@ import '../../routes/app_pages.dart';
 
 class HomeController extends GetxController {
   final _authRepo = AuthRepository();
+
   final user = Rxn<UserModel>();
+  final isLoading = false.obs;
+  final errorMessage = ''.obs;
 
   @override
   void onInit() {
@@ -14,12 +17,27 @@ class HomeController extends GetxController {
   }
 
   Future<void> _loadUser() async {
-    final (u, _) = await _authRepo.loadSaved();
-    user.value = u;
+    try {
+      isLoading(true);
+      errorMessage('');
+      final (u, _) = await _authRepo.loadSaved();
+      user.value = u;
+    } catch (e) {
+      errorMessage('Terjadi kesalahan: ${e.toString()}');
+    } finally {
+      isLoading(false);
+    }
   }
 
   Future<void> logout() async {
-    await _authRepo.logout();
-    Get.offAllNamed(Routes.login);
+    try {
+      isLoading(true);
+      await _authRepo.logout();
+      Get.offAllNamed(Routes.login);
+    } catch (e) {
+      errorMessage('Terjadi kesalahan: ${e.toString()}');
+    } finally {
+      isLoading(false);
+    }
   }
 }

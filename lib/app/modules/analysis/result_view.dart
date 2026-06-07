@@ -4,6 +4,9 @@ import 'package:get/get.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../data/models/analysis_model.dart';
 import '../../routes/app_pages.dart';
+import '../../widgets/bcs_score_card.dart';
+import '../../widgets/paw_button.dart';
+import '../../widgets/paw_card.dart';
 import 'analysis_controller.dart';
 
 class ResultView extends GetView<AnalysisController> {
@@ -15,8 +18,11 @@ class ResultView extends GetView<AnalysisController> {
       final result = controller.analysisResult.value;
       if (result == null) return const SizedBox.shrink();
       return Scaffold(
+        backgroundColor: AppColors.background,
         appBar: AppBar(
           title: const Text('Hasil Analisis'),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
           automaticallyImplyLeading: false,
           actions: [
             TextButton(
@@ -33,30 +39,34 @@ class ResultView extends GetView<AnalysisController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _BcsCard(result: result),
+              BcsScoreCard(
+                score: result.bcsScore,
+                category: result.bcsCategory,
+                rer: result.rer,
+                mer: result.mer,
+              ),
+              const SizedBox(height: 16),
+              _BreedChip(result: result),
               const SizedBox(height: 16),
               _InfoCard(result: result),
               const SizedBox(height: 16),
               _NutritionCard(result: result),
               const SizedBox(height: 24),
-              ElevatedButton.icon(
-                onPressed: () => _showAddPetDialog(context, result),
-                icon: const Icon(Icons.pets),
-                label: const Text('Simpan sebagai Hewan Peliharaan'),
+              PawButton(
+                label: 'Simpan sebagai Hewan Peliharaan',
+                onTap: () => _showAddPetDialog(context, result),
+                icon: Icons.pets,
               ),
               const SizedBox(height: 12),
-              OutlinedButton(
-                onPressed: () {
+              PawButton(
+                label: 'Analisis Lagi',
+                isOutlined: true,
+                onTap: () {
                   controller.reset();
                   Get.back();
                 },
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 52),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
-                ),
-                child: const Text('Analisis Lagi'),
               ),
+              const SizedBox(height: 24),
             ],
           ),
         ),
@@ -68,7 +78,8 @@ class ResultView extends GetView<AnalysisController> {
     final nameCtrl = TextEditingController();
     Get.dialog(
       AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text('Beri Nama Hewanmu'),
         content: TextField(
           controller: nameCtrl,
@@ -78,7 +89,8 @@ class ResultView extends GetView<AnalysisController> {
         actions: [
           TextButton(onPressed: Get.back, child: const Text('Batal')),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(minimumSize: const Size(80, 40)),
+            style:
+                ElevatedButton.styleFrom(minimumSize: const Size(80, 40)),
             onPressed: () {
               final name = nameCtrl.text.trim();
               if (name.isEmpty) return;
@@ -97,59 +109,47 @@ class ResultView extends GetView<AnalysisController> {
   }
 }
 
-class _BcsCard extends StatelessWidget {
+class _BreedChip extends StatelessWidget {
   final AnalysisModel result;
-  const _BcsCard({required this.result});
-
-  Color get _bcsColor {
-    switch (result.bcsScore) {
-      case 1: return const Color(0xFF2196F3);
-      case 2: return const Color(0xFF03A9F4);
-      case 3: return AppColors.success;
-      case 4: return const Color(0xFFFF9800);
-      default: return AppColors.error;
-    }
-  }
+  const _BreedChip({required this.result});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: _bcsColor.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _bcsColor.withValues(alpha: 0.4)),
-      ),
+    return PawCard(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
-          Text(result.bcsEmoji, style: const TextStyle(fontSize: 52)),
-          const SizedBox(width: 20),
+          const Icon(Icons.biotech_rounded,
+              color: AppColors.primary, size: 20),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const Text('Prediksi Ras',
+                    style: TextStyle(
+                        fontSize: 11, color: AppColors.textMedium)),
                 Text(
-                  'BCS ${result.bcsScore}/5',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    color: _bcsColor,
-                  ),
-                ),
-                Text(
-                  result.bcsCategory,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: _bcsColor,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${result.breedPrediction} (${result.confidencePercent})',
-                  style: const TextStyle(fontSize: 13, color: AppColors.textMedium),
+                  result.breedPrediction,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w700, fontSize: 14),
                 ),
               ],
+            ),
+          ),
+          Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              result.confidencePercent,
+              style: const TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12),
             ),
           ),
         ],
@@ -164,23 +164,23 @@ class _InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Detail Pengukuran',
-                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
-            const Divider(height: 20),
-            _Row('Berat Aktual', '${result.weightKg} kg'),
-            _Row('Berat Ideal', '${result.idealWeightUsed} kg'),
-            _Row('RER', '${result.rer} kkal/hari'),
-            _Row('MER', '${result.mer} kkal/hari'),
-            _Row('Usia', '${result.ageYears} tahun'),
-            _Row('Gender', result.gender == 'male' ? 'Jantan' : 'Betina'),
-          ],
-        ),
+    return PawCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Detail Pengukuran',
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+          ),
+          const Divider(height: 20),
+          _Row('Berat Aktual', '${result.weightKg} kg'),
+          _Row('Berat Ideal', '${result.idealWeightUsed} kg'),
+          _Row('RER', '${result.rer.toStringAsFixed(0)} kkal/hari'),
+          _Row('MER', '${result.mer.toStringAsFixed(0)} kkal/hari'),
+          _Row('Usia', '${result.ageYears} tahun'),
+          _Row('Gender',
+              result.gender == 'male' ? 'Jantan' : 'Betina'),
+        ],
       ),
     );
   }
@@ -194,12 +194,14 @@ class _Row extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: AppColors.textMedium)),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
+          Text(label,
+              style: const TextStyle(color: AppColors.textMedium)),
+          Text(value,
+              style: const TextStyle(fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -214,25 +216,33 @@ class _NutritionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final rec = result.nutritionRecommendation;
     if (rec == null || rec.isEmpty) return const SizedBox.shrink();
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Rekomendasi Nutrisi',
-                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
-            const Divider(height: 20),
-            MarkdownBody(
-              data: rec,
-              styleSheet: MarkdownStyleSheet(
-                p: const TextStyle(fontSize: 13, color: AppColors.textDark),
-                listBullet:
-                    const TextStyle(fontSize: 13, color: AppColors.textDark),
+    return PawCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.restaurant_rounded,
+                  color: AppColors.primary, size: 18),
+              SizedBox(width: 8),
+              Text(
+                'Rekomendasi Nutrisi',
+                style: TextStyle(
+                    fontWeight: FontWeight.w700, fontSize: 15),
               ),
+            ],
+          ),
+          const Divider(height: 20),
+          MarkdownBody(
+            data: rec,
+            styleSheet: MarkdownStyleSheet(
+              p: const TextStyle(
+                  fontSize: 13, color: AppColors.textDark),
+              listBullet: const TextStyle(
+                  fontSize: 13, color: AppColors.textDark),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

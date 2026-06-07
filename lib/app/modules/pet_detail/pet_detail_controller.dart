@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../data/models/pet_model.dart';
 import '../../data/repositories/pet_repository.dart';
 
 class PetDetailController extends GetxController {
   final _repo = PetRepository();
+
   final pet = Rxn<PetModel>();
   final isLoading = false.obs;
+  final errorMessage = ''.obs;
   final nameCtrl = TextEditingController();
 
   @override
@@ -16,7 +19,7 @@ class PetDetailController extends GetxController {
     if (arg is PetModel) {
       pet.value = arg;
       nameCtrl.text = arg.name;
-      _refresh(arg.id);
+      loadPetDetail(arg.id);
     }
   }
 
@@ -26,12 +29,21 @@ class PetDetailController extends GetxController {
     super.onClose();
   }
 
-  Future<void> _refresh(int id) async {
-    isLoading.value = true;
+  Future<void> loadPetDetail(int id) async {
     try {
-      pet.value = await _repo.getPet(id);
-    } catch (_) {}
-    isLoading.value = false;
+      isLoading(true);
+      errorMessage('');
+      final result = await _repo.getPet(id);
+      if (result.success) {
+        pet.value = result.data;
+      } else {
+        errorMessage(result.message ?? 'Gagal memuat detail.');
+      }
+    } catch (e) {
+      errorMessage('Terjadi kesalahan: ${e.toString()}');
+    } finally {
+      isLoading(false);
+    }
   }
 
   Future<void> updateName() async {
@@ -41,31 +53,53 @@ class PetDetailController extends GetxController {
       return;
     }
     try {
-      final updated = await _repo.updatePet(pet.value!.id, name);
-      pet.value = updated;
-      Get.back();
-      Get.snackbar('Berhasil', 'Nama diperbarui.',
-          backgroundColor: Colors.green[100]);
+      isLoading(true);
+      errorMessage('');
+      final result = await _repo.updatePet(pet.value!.id, name);
+      if (result.success) {
+        pet.value = result.data;
+        Get.back();
+        Get.snackbar(
+          'Berhasil',
+          'Nama berhasil diperbarui.',
+          backgroundColor: AppColors.accent,
+          colorText: AppColors.textDark,
+          snackPosition: SnackPosition.BOTTOM,
+          margin: const EdgeInsets.all(16),
+          borderRadius: 12,
+        );
+      } else {
+        errorMessage(result.message ?? 'Gagal memperbarui nama.');
+      }
     } catch (e) {
-      Get.snackbar('Error', e.toString(), backgroundColor: Colors.red[100]);
+      errorMessage('Terjadi kesalahan: ${e.toString()}');
+    } finally {
+      isLoading(false);
     }
   }
 
   void showEditNameDialog() {
     nameCtrl.text = pet.value?.name ?? '';
+    errorMessage('');
     Get.dialog(
       AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text('Ubah Nama'),
         content: TextField(
           controller: nameCtrl,
-          decoration: const InputDecoration(labelText: 'Nama hewan'),
+          decoration: InputDecoration(
+            labelText: 'Nama hewan',
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12)),
+          ),
           autofocus: true,
         ),
         actions: [
           TextButton(onPressed: Get.back, child: const Text('Batal')),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(minimumSize: const Size(80, 40)),
+            style: ElevatedButton.styleFrom(
+                minimumSize: const Size(80, 40)),
             onPressed: updateName,
             child: const Text('Simpan'),
           ),

@@ -5,10 +5,12 @@ import '../../../routes/app_pages.dart';
 
 class LoginController extends GetxController {
   final _repo = AuthRepository();
+
   final emailCtrl = TextEditingController();
   final passwordCtrl = TextEditingController();
+
   final isLoading = false.obs;
-  final obscurePassword = true.obs;
+  final errorMessage = ''.obs;
 
   @override
   void onClose() {
@@ -21,19 +23,22 @@ class LoginController extends GetxController {
     final email = emailCtrl.text.trim();
     final password = passwordCtrl.text;
     if (email.isEmpty || password.isEmpty) {
-      Get.snackbar('Error', 'Email dan password wajib diisi.',
-          backgroundColor: Colors.red[100]);
+      errorMessage('Email dan password wajib diisi.');
       return;
     }
-    isLoading.value = true;
     try {
-      await _repo.login(email, password);
-      Get.offAllNamed(Routes.home);
+      isLoading(true);
+      errorMessage('');
+      final result = await _repo.login(email, password);
+      if (result.success) {
+        Get.offAllNamed(Routes.home);
+      } else {
+        errorMessage(result.message ?? 'Login gagal.');
+      }
     } catch (e) {
-      Get.snackbar('Login Gagal', e.toString(),
-          backgroundColor: Colors.red[100]);
+      errorMessage('Terjadi kesalahan: ${e.toString()}');
     } finally {
-      isLoading.value = false;
+      isLoading(false);
     }
   }
 }
