@@ -78,23 +78,31 @@ class LoginView extends GetView<LoginController> {
                     width: double.infinity,
                     margin: const EdgeInsets.only(bottom: 4),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 10),
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.error.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                          color: AppColors.error.withValues(alpha: 0.3)),
+                        color: AppColors.error.withValues(alpha: 0.3),
+                      ),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.error_outline,
-                            color: AppColors.error, size: 16),
+                        const Icon(
+                          Icons.error_outline,
+                          color: AppColors.error,
+                          size: 16,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             controller.errorMessage.value,
                             style: const TextStyle(
-                                color: AppColors.error, fontSize: 13),
+                              color: AppColors.error,
+                              fontSize: 13,
+                            ),
                           ),
                         ),
                       ],
@@ -102,18 +110,22 @@ class LoginView extends GetView<LoginController> {
                   );
                 }),
                 const SizedBox(height: 16),
-                Obx(() => PawButton(
-                      label: 'Masuk',
-                      isLoading: controller.isLoading.value,
-                      onTap: controller.login,
-                      icon: Icons.login_rounded,
-                    )),
+                Obx(
+                  () => PawButton(
+                    label: 'Masuk',
+                    isLoading: controller.isLoading.value,
+                    onTap: controller.login,
+                    icon: Icons.login_rounded,
+                  ),
+                ),
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Belum punya akun? ',
-                        style: TextStyle(color: AppColors.textMedium)),
+                    const Text(
+                      'Belum punya akun? ',
+                      style: TextStyle(color: AppColors.textMedium),
+                    ),
                     GestureDetector(
                       onTap: () => Get.toNamed(Routes.REGISTER),
                       child: const Text(
