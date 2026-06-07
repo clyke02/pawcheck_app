@@ -33,7 +33,7 @@ class LoginController extends GetxController {
       errorMessage('');
       final result = await repository.login(email, password);
       if (result.success) {
-        Get.offAllNamed(Routes.HOME);
+        Get.offAllNamed(Routes.MAIN);
       } else {
         errorMessage(result.message ?? 'Login gagal.');
       }

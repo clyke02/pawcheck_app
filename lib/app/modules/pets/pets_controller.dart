@@ -15,15 +15,7 @@ class PetsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    final args = Get.arguments as Map<String, dynamic>?;
-    if (args != null && args['createFromAnalysis'] == true) {
-      _createFromAnalysis(
-        args['name'] as String,
-        args['analysisId'] as int,
-      );
-    } else {
-      loadPets();
-    }
+    loadPets();
   }
 
   Future<void> loadPets() async {
@@ -41,32 +33,6 @@ class PetsController extends GetxController {
     } finally {
       isLoading(false);
     }
-  }
-
-  Future<void> _createFromAnalysis(String name, int analysisId) async {
-    try {
-      isLoading(true);
-      errorMessage('');
-      final result = await repository.createPet(name, analysisId);
-      if (result.success) {
-        Get.snackbar(
-          'Berhasil!',
-          '${result.data?.name ?? name} berhasil disimpan.',
-          backgroundColor: AppColors.accent,
-          colorText: AppColors.textDark,
-          snackPosition: SnackPosition.BOTTOM,
-          margin: const EdgeInsets.all(16),
-          borderRadius: 12,
-        );
-      } else {
-        errorMessage(result.message ?? 'Gagal menyimpan hewan.');
-      }
-    } catch (e) {
-      errorMessage('Terjadi kesalahan: ${e.toString()}');
-    } finally {
-      isLoading(false);
-    }
-    await loadPets();
   }
 
   Future<void> deletePet(int id) async {

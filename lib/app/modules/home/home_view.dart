@@ -12,73 +12,31 @@ class HomeView extends GetView<HomeController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('PawCheck'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        actions: [
-          Obx(() => controller.isLoading.value
-              ? const SizedBox.shrink()
-              : IconButton(
-                  icon: const Icon(Icons.logout_rounded),
-                  tooltip: 'Keluar',
-                  onPressed: controller.logout,
-                )),
-        ],
-      ),
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading.value) {
             return const PawLoadingWidget(message: 'Memuat...');
           }
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Halo, ${controller.user.value?.name ?? ''}! 👋',
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textDark,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Obx(() => Text(
-                      controller.petsCount.value == 0
-                          ? 'Belum ada hewan peliharaan.'
-                          : 'Kamu punya ${controller.petsCount.value} hewan peliharaan.',
-                      style: const TextStyle(
-                          color: AppColors.textMedium, fontSize: 13),
-                    )),
-                const SizedBox(height: 32),
-                _MenuCard(
-                  icon: Icons.camera_alt_rounded,
-                  title: 'Analisis BCS',
-                  subtitle: 'Foto hewan & cek kondisi tubuhnya',
-                  color: AppColors.primary,
-                  onTap: () => Get.toNamed(Routes.ANALYSIS),
-                ),
-                const SizedBox(height: 16),
-                _MenuCard(
-                  icon: Icons.pets,
-                  title: 'Hewan Peliharaan',
-                  subtitle: 'Lihat & kelola daftar hewanmu',
-                  color: AppColors.accent,
-                  onTap: () => Get.toNamed(Routes.PETS),
-                ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 20),
+                _Header(onLogout: controller.logout),
+                const SizedBox(height: 28),
+                _AnalysisHeroCard(onTap: () => Get.toNamed(Routes.ANALYSIS)),
+                const SizedBox(height: 20),
                 Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
                     color: AppColors.secondary,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(18),
                   ),
                   child: const Row(
                     children: [
-                      Text('🐾', style: TextStyle(fontSize: 36)),
-                      SizedBox(width: 16),
+                      Text('🐾', style: TextStyle(fontSize: 32)),
+                      SizedBox(width: 14),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,10 +45,10 @@ class HomeView extends GetView<HomeController> {
                               'Body Condition Score',
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
-                                fontSize: 15,
+                                fontSize: 14,
                               ),
                             ),
-                            SizedBox(height: 4),
+                            SizedBox(height: 3),
                             Text(
                               'BCS mengukur kondisi ideal tubuh hewanmu dari skala 1-5 berdasarkan berat & ras.',
                               style: TextStyle(
@@ -104,6 +62,7 @@ class HomeView extends GetView<HomeController> {
                     ],
                   ),
                 ),
+                const SizedBox(height: 24),
               ],
             ),
           );
@@ -113,59 +72,132 @@ class HomeView extends GetView<HomeController> {
   }
 }
 
-class _MenuCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final Color color;
-  final VoidCallback onTap;
+class _Header extends StatelessWidget {
+  final VoidCallback onLogout;
+  const _Header({required this.onLogout});
 
-  const _MenuCard({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.color,
-    required this.onTap,
-  });
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [AppColors.primary, Color(0xFFFF8E53)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: const Icon(Icons.pets, color: Colors.white, size: 20),
+        ),
+        const SizedBox(width: 10),
+        const Text(
+          'PawCheck',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: AppColors.primary,
+          ),
+        ),
+        const Spacer(),
+        IconButton(
+          onPressed: onLogout,
+          icon: const Icon(Icons.logout_rounded),
+          color: AppColors.textMedium,
+          tooltip: 'Keluar',
+        ),
+      ],
+    );
+  }
+}
+
+class _AnalysisHeroCard extends StatelessWidget {
+  final VoidCallback onTap;
+  const _AnalysisHeroCard({required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 24),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: color.withValues(alpha: 0.3)),
+          gradient: const LinearGradient(
+            colors: [AppColors.primary, Color(0xFFFF8E53)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.35),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
-        child: Row(
+        child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: color,
+                color: Colors.white.withValues(alpha: 0.25),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.camera_alt_rounded,
+                size: 56,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Analisis BCS',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'Foto hewanmu & cek kondisi\ntubuhnya sekarang',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.white70,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(icon, color: Colors.white, size: 28),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(title,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w700, fontSize: 16)),
-                  const SizedBox(height: 2),
-                  Text(subtitle,
-                      style: const TextStyle(
-                          color: AppColors.textMedium, fontSize: 13)),
+                  Icon(Icons.play_arrow_rounded,
+                      color: AppColors.primary, size: 20),
+                  SizedBox(width: 6),
+                  Text(
+                    'Mulai Analisis',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                    ),
+                  ),
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward_ios_rounded,
-                size: 16, color: AppColors.textLight),
           ],
         ),
       ),

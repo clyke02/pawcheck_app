@@ -108,6 +108,6 @@ class AnalysisResultController extends GetxController {
   }
 
   void done() {
-    Get.offAllNamed(Routes.HOME);
+    Get.offAllNamed(Routes.MAIN);
   }
 }

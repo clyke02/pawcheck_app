@@ -40,7 +40,7 @@ class RegisterController extends GetxController {
       errorMessage('');
       final result = await repository.register(name, email, password);
       if (result.success) {
-        Get.offAllNamed(Routes.HOME);
+        Get.offAllNamed(Routes.MAIN);
       } else {
         errorMessage(result.message ?? 'Registrasi gagal.');
       }
