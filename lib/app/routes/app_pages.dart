@@ -1,16 +1,16 @@
 import 'package:get/get.dart';
-import '../modules/auth/login/login_binding.dart';
-import '../modules/auth/login/login_view.dart';
-import '../modules/auth/register/register_binding.dart';
-import '../modules/auth/register/register_view.dart';
-import '../modules/main/main_binding.dart';
-import '../modules/main/main_view.dart';
-import '../modules/analysis/analysis_binding.dart';
-import '../modules/analysis/analysis_result_binding.dart';
-import '../modules/analysis/analysis_view.dart';
-import '../modules/analysis/result_view.dart';
-import '../modules/pet_detail/pet_detail_binding.dart';
-import '../modules/pet_detail/pet_detail_view.dart';
+import '../modules/auth/login/bindings/login_binding.dart';
+import '../modules/auth/login/views/login_view.dart';
+import '../modules/auth/register/bindings/register_binding.dart';
+import '../modules/auth/register/views/register_view.dart';
+import '../modules/main/bindings/main_binding.dart';
+import '../modules/main/views/main_view.dart';
+import '../modules/analysis/bindings/analysis_binding.dart';
+import '../modules/analysis/bindings/analysis_result_binding.dart';
+import '../modules/analysis/views/analysis_view.dart';
+import '../modules/analysis/views/result_view.dart';
+import '../modules/pet_detail/bindings/pet_detail_binding.dart';
+import '../modules/pet_detail/views/pet_detail_view.dart';
 
 abstract class Routes {
   static const LOGIN = '/login';
