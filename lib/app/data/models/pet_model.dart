@@ -53,4 +53,16 @@ class PetModel {
 
   AnalysisModel? get latestAnalysis =>
       (analyses != null && analyses!.isNotEmpty) ? analyses!.first : null;
+
+  PetModel copyWith({String? name}) => PetModel(
+        id: id,
+        userId: userId,
+        breedId: breedId,
+        name: name ?? this.name,
+        gender: gender,
+        breed: breed,
+        analyses: analyses,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
 }

@@ -59,7 +59,7 @@ class PetDetailController extends GetxController {
       errorMessage('');
       final result = await repository.updatePet(pet.value!.id, name);
       if (result.success) {
-        pet.value = result.data;
+        pet.value = pet.value!.copyWith(name: name);
         Get.back();
         PawSnackbar.success('Nama berhasil diperbarui.');
       } else {
