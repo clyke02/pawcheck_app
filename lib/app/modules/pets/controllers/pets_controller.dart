@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../../data/models/pet_model.dart';
 import '../../../data/repositories/pet_repository.dart';
+import '../../../widgets/paw_snackbar.dart';
 
 class PetsController extends GetxController {
   final PetRepository repository;
@@ -42,15 +41,7 @@ class PetsController extends GetxController {
       final result = await repository.deletePet(id);
       if (result.success) {
         pets.removeWhere((p) => p.id == id);
-        Get.snackbar(
-          'Berhasil',
-          'Hewan peliharaan dihapus.',
-          backgroundColor: AppColors.accent,
-          colorText: AppColors.textDark,
-          snackPosition: SnackPosition.BOTTOM,
-          margin: const EdgeInsets.all(16),
-          borderRadius: 12,
-        );
+        PawSnackbar.success('Hewan peliharaan berhasil dihapus.');
       } else {
         errorMessage(result.message ?? 'Gagal menghapus hewan.');
       }

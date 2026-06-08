@@ -24,7 +24,9 @@ class HomeView extends GetView<HomeController> {
               children: [
                 const SizedBox(height: 20),
                 _Header(onLogout: controller.logout),
-                const SizedBox(height: 28),
+                const SizedBox(height: 24),
+                _WelcomeBanner(name: controller.user.value?.name ?? ''),
+                const SizedBox(height: 20),
                 _AnalysisHeroCard(onTap: () => Get.toNamed(Routes.ANALYSIS)),
                 const SizedBox(height: 20),
                 Container(
@@ -108,6 +110,38 @@ class _Header extends StatelessWidget {
           icon: const Icon(Icons.logout_rounded),
           color: AppColors.textMedium,
           tooltip: 'Keluar',
+        ),
+      ],
+    );
+  }
+}
+
+class _WelcomeBanner extends StatelessWidget {
+  final String name;
+  const _WelcomeBanner({required this.name});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Selamat Datang,',
+          style: TextStyle(
+            fontSize: 14,
+            color: AppColors.textMedium,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          name.isEmpty ? 'Pengguna' : name,
+          style: const TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textDark,
+            height: 1.1,
+          ),
         ),
       ],
     );

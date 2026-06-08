@@ -4,6 +4,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../data/models/analysis_model.dart';
 import '../../../data/repositories/pet_repository.dart';
 import '../../../routes/app_pages.dart';
+import '../../../widgets/paw_snackbar.dart';
 
 class AnalysisResultController extends GetxController {
   final PetRepository petRepository;
@@ -39,15 +40,7 @@ class AnalysisResultController extends GetxController {
       final result = await petRepository.createPet(name, id);
       if (result.success) {
         Get.back();
-        Get.snackbar(
-          'Berhasil!',
-          '${result.data?.name ?? name} berhasil disimpan.',
-          backgroundColor: AppColors.accent,
-          colorText: AppColors.textDark,
-          snackPosition: SnackPosition.BOTTOM,
-          margin: const EdgeInsets.all(16),
-          borderRadius: 12,
-        );
+        PawSnackbar.success('${result.data?.name ?? name} berhasil disimpan.');
       } else {
         errorMessage(result.message ?? 'Gagal menyimpan hewan.');
       }
@@ -107,7 +100,13 @@ class AnalysisResultController extends GetxController {
     );
   }
 
+  bool get isViewMode => analysis.value?.petId != null;
+
   void done() {
-    Get.offAllNamed(Routes.MAIN);
+    if (isViewMode) {
+      Get.back();
+    } else {
+      Get.offAllNamed(Routes.MAIN);
+    }
   }
 }

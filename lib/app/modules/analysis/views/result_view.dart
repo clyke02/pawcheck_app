@@ -3,6 +3,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:get/get.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../widgets/bcs_score_card.dart';
+import '../../../widgets/paw_app_bar.dart';
 import '../../../widgets/paw_button.dart';
 import '../../../widgets/paw_card.dart';
 import '../../../widgets/paw_loading_widget.dart';
@@ -18,19 +19,24 @@ class ResultView extends GetView<AnalysisResultController> {
       if (result == null) {
         return const Scaffold(body: PawLoadingWidget());
       }
+      final isView = result.petId != null;
       return Scaffold(
         backgroundColor: AppColors.background,
-        appBar: AppBar(
-          title: const Text('Hasil Analisis'),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          actions: [
-            TextButton(
-              onPressed: controller.done,
-              child: const Text('Selesai'),
-            ),
-          ],
+        appBar: PawAppBar(
+          title: 'Hasil Analisis',
+          automaticallyImplyLeading: isView,
+          actions: isView
+              ? null
+              : [
+                  TextButton(
+                    onPressed: controller.done,
+                    child: const Text(
+                      'Selesai',
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ],
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
@@ -53,17 +59,24 @@ class ResultView extends GetView<AnalysisResultController> {
               const SizedBox(height: 16),
               _NutritionCard(nutritionRec: result.nutritionRecommendation),
               const SizedBox(height: 24),
-              PawButton(
-                label: 'Simpan sebagai Hewan Peliharaan',
-                onTap: controller.showSaveSheet,
-                icon: Icons.pets,
-              ),
-              const SizedBox(height: 12),
-              PawButton(
-                label: 'Analisis Lagi',
-                isOutlined: true,
-                onTap: Get.back,
-              ),
+              if (!isView) ...[
+                PawButton(
+                  label: 'Simpan sebagai Hewan Peliharaan',
+                  onTap: controller.showSaveSheet,
+                  icon: Icons.pets,
+                ),
+                const SizedBox(height: 12),
+                PawButton(
+                  label: 'Analisis Lagi',
+                  isOutlined: true,
+                  onTap: Get.back,
+                ),
+              ] else
+                PawButton(
+                  label: 'Kembali',
+                  isOutlined: true,
+                  onTap: Get.back,
+                ),
               const SizedBox(height: 24),
             ],
           ),

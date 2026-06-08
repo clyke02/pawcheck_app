@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../../core/theme/app_theme.dart';
+import '../../../../widgets/paw_app_bar.dart';
 import '../../../../widgets/paw_button.dart';
 import '../../../../widgets/paw_text_field.dart';
 import '../controllers/register_controller.dart';
@@ -12,11 +13,7 @@ class RegisterView extends GetView<RegisterController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Buat Akun'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
+      appBar: const PawAppBar(title: 'Buat Akun'),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),

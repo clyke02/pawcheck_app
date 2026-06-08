@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../data/models/pet_model.dart';
 import '../../../data/repositories/pet_repository.dart';
+import '../../../widgets/paw_snackbar.dart';
 
 class PetDetailController extends GetxController {
   final PetRepository repository;
@@ -60,20 +61,51 @@ class PetDetailController extends GetxController {
       if (result.success) {
         pet.value = result.data;
         Get.back();
-        Get.snackbar(
-          'Berhasil',
-          'Nama berhasil diperbarui.',
-          backgroundColor: AppColors.accent,
-          colorText: AppColors.textDark,
-          snackPosition: SnackPosition.BOTTOM,
-          margin: const EdgeInsets.all(16),
-          borderRadius: 12,
-        );
+        PawSnackbar.success('Nama berhasil diperbarui.');
       } else {
         errorMessage(result.message ?? 'Gagal memperbarui nama.');
       }
     } catch (e) {
       errorMessage('Gagal mengubah nama, coba lagi.');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> deletePet() async {
+    final petName = pet.value?.name ?? 'Hewan';
+    final confirmed = await Get.dialog<bool>(
+      AlertDialog(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Hapus Hewan?'),
+        content: Text(
+            'Hapus $petName? Semua riwayat analisis juga akan terhapus.'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () => Get.back(result: true),
+            child: const Text('Hapus',
+                style: TextStyle(color: AppColors.error)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      isLoading(true);
+      final result = await repository.deletePet(pet.value!.id);
+      if (result.success) {
+        Get.back();
+        PawSnackbar.success('$petName berhasil dihapus.');
+      } else {
+        errorMessage(result.message ?? 'Gagal menghapus.');
+      }
+    } catch (e) {
+      errorMessage('Gagal menghapus, coba lagi.');
     } finally {
       isLoading(false);
     }

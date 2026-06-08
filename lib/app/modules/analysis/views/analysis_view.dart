@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../widgets/gender_toggle.dart';
+import '../../../widgets/paw_app_bar.dart';
 import '../../../widgets/paw_button.dart';
 import '../../../widgets/paw_loading_widget.dart';
 import '../../../widgets/paw_text_field.dart';
@@ -14,11 +15,7 @@ class AnalysisView extends GetView<AnalysisController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Analisis BCS'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
+      appBar: const PawAppBar(title: 'Analisis BCS'),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const PawLoadingWidget(
