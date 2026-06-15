@@ -50,7 +50,11 @@ class PetDetailController extends GetxController {
 
   Future<void> updateName() async {
     final name = nameCtrl.text.trim();
-    if (name.isEmpty || name == pet.value?.name) {
+    if (name.isEmpty) {
+      errorMessage('Nama hewan wajib diisi.');
+      return;
+    }
+    if (name == pet.value?.name) {
       Get.back();
       return;
     }
