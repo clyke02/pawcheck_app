@@ -55,7 +55,7 @@ class PetDetailController extends GetxController {
       return;
     }
     if (name == pet.value?.name) {
-      Get.back();
+      errorMessage('Tidak ada perubahan pada nama.');
       return;
     }
     try {
