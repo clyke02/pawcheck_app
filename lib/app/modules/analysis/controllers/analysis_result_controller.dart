@@ -33,7 +33,11 @@ class AnalysisResultController extends GetxController {
   Future<void> savePet() async {
     final name = petNameCtrl.text.trim();
     final id = analysis.value?.id;
-    if (id == null || name.isEmpty) return;
+    if (id == null) return;
+    if (name.isEmpty) {
+      errorMessage('Nama hewan wajib diisi.');
+      return;
+    }
     try {
       isSaving(true);
       errorMessage('');
