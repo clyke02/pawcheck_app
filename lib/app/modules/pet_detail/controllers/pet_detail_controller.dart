@@ -12,6 +12,7 @@ class PetDetailController extends GetxController {
   final pet = Rxn<PetModel>();
   final isLoading = false.obs;
   final errorMessage = ''.obs;
+  final dialogErrorMessage = ''.obs;
   final nameCtrl = TextEditingController();
 
   @override
@@ -51,26 +52,26 @@ class PetDetailController extends GetxController {
   Future<void> updateName() async {
     final name = nameCtrl.text.trim();
     if (name.isEmpty) {
-      errorMessage('Nama hewan wajib diisi.');
+      dialogErrorMessage('Nama hewan wajib diisi.');
       return;
     }
     if (name == pet.value?.name) {
-      errorMessage('Tidak ada perubahan pada nama.');
+      dialogErrorMessage('Tidak ada perubahan pada nama.');
       return;
     }
     try {
       isLoading(true);
-      errorMessage('');
+      dialogErrorMessage('');
       final result = await repository.updatePet(pet.value!.id, name);
       if (result.success) {
         pet.value = pet.value!.copyWith(name: name);
         Get.back();
         PawSnackbar.success('Nama berhasil diperbarui.');
       } else {
-        errorMessage(result.message ?? 'Gagal memperbarui nama.');
+        dialogErrorMessage(result.message ?? 'Gagal memperbarui nama.');
       }
     } catch (e) {
-      errorMessage('Gagal mengubah nama, coba lagi.');
+      dialogErrorMessage('Gagal mengubah nama, coba lagi.');
     } finally {
       isLoading(false);
     }
@@ -117,20 +118,36 @@ class PetDetailController extends GetxController {
 
   void showEditNameDialog() {
     nameCtrl.text = pet.value?.name ?? '';
-    errorMessage('');
+    dialogErrorMessage('');
     Get.dialog(
       AlertDialog(
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20)),
         title: const Text('Ubah Nama'),
-        content: TextField(
-          controller: nameCtrl,
-          decoration: InputDecoration(
-            labelText: 'Nama hewan',
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12)),
-          ),
-          autofocus: true,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameCtrl,
+              decoration: InputDecoration(
+                labelText: 'Nama hewan',
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12)),
+              ),
+              autofocus: true,
+            ),
+            Obx(() {
+              if (dialogErrorMessage.value.isEmpty) return const SizedBox.shrink();
+              return Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  dialogErrorMessage.value,
+                  style: const TextStyle(
+                      color: AppColors.error, fontSize: 12),
+                ),
+              );
+            }),
+          ],
         ),
         actions: [
           TextButton(onPressed: Get.back, child: const Text('Batal')),
