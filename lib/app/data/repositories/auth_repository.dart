@@ -13,6 +13,7 @@ class AuthRepository {
         '/auth/register',
         {'name': name, 'email': email, 'password': password},
         withAuth: false,
+        timeout: const Duration(seconds: 30),
       );
       return ApiResponse.success(true, message: res['message'] as String?);
     } on ApiException catch (e) {
@@ -28,6 +29,7 @@ class AuthRepository {
         '/auth/login',
         {'email': email, 'password': password},
         withAuth: false,
+        timeout: const Duration(seconds: 30),
       );
       final user = UserModel.fromJson(res['user'] as Map<String, dynamic>);
       final token = res['token'] as String;
@@ -66,6 +68,7 @@ class AuthRepository {
         '/auth/resend-otp',
         {'email': email},
         withAuth: false,
+        timeout: const Duration(seconds: 30),
       );
       return ApiResponse.success(true, message: res['message'] as String?);
     } on ApiException catch (e) {

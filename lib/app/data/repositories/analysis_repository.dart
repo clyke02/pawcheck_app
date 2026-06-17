@@ -20,6 +20,7 @@ class AnalysisRepository {
 
   Future<ApiResponse<AnalysisModel>> analyze({
     required File image,
+    required String petName,
     required double weightKg,
     required double ageYears,
     required String gender,
@@ -28,6 +29,7 @@ class AnalysisRepository {
       final res = await ApiProvider.postMultipart(
         '/analyses',
         {
+          'pet_name': petName,
           'weight_kg': weightKg.toString(),
           'age_years': ageYears.toString(),
           'gender': gender,

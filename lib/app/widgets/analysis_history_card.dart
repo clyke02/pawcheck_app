@@ -16,82 +16,121 @@ class AnalysisHistoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = BcsScoreCard.colorForScore(analysis.bcsScore);
+    final darkColor = _darkColor(analysis.bcsScore);
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFFEEEEEE)),
-          boxShadow: onTap != null
-              ? [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.055),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: Row(
           children: [
+            // Score badge
             Container(
-              width: 44,
-              height: 44,
+              width: 52,
+              height: 52,
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12),
+                gradient: LinearGradient(
+                  colors: [color, darkColor],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(14),
               ),
-              child: Center(
-                child: Text(analysis.bcsEmoji,
-                    style: const TextStyle(fontSize: 22)),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${analysis.bcsScore}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                      height: 1,
+                    ),
+                  ),
+                  Text(
+                    '/5',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.7),
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(width: 12),
+            // Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                            color: color, shape: BoxShape.circle),
-                      ),
-                      const SizedBox(width: 6),
                       Text(
-                        'BCS ${analysis.bcsScore} · ${analysis.bcsCategory}',
+                        'BCS ${analysis.bcsScore}',
                         style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 13,
-                            color: color),
+                          fontWeight: FontWeight.w800,
+                          fontSize: 14,
+                          color: color,
+                        ),
+                      ),
+                      Text(
+                        '  ·  ${analysis.bcsCategory}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                          color: AppColors.textDark,
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    '${analysis.weightKg} kg · MER ${analysis.mer.toStringAsFixed(0)} kkal/hari',
+                    '${analysis.weightKg} kg  ·  MER ${analysis.mer.toStringAsFixed(0)} kkal/hari',
                     style: const TextStyle(
-                        fontSize: 12, color: AppColors.textMedium),
+                      fontSize: 12,
+                      color: AppColors.textMedium,
+                    ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 3),
                   Text(
                     analysis.timeAgo,
-                    style: const TextStyle(
-                        fontSize: 11, color: AppColors.textLight),
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textMedium.withValues(alpha: 0.6),
+                    ),
                   ),
                 ],
               ),
             ),
             if (onTap != null)
-              const Icon(Icons.chevron_right_rounded,
-                  color: AppColors.textLight, size: 20),
+              Icon(Icons.chevron_right_rounded, color: color, size: 22),
           ],
         ),
       ),
     );
+  }
+
+  static Color _darkColor(int score) {
+    switch (score) {
+      case 1: return const Color(0xFFB71C1C);
+      case 2: return const Color(0xFFBF360C);
+      case 3: return const Color(0xFF2E7D32);
+      case 4: return const Color(0xFFBF360C);
+      case 5: return const Color(0xFFB71C1C);
+      default: return const Color(0xFF424242);
+    }
   }
 }

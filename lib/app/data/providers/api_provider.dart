@@ -55,6 +55,7 @@ class ApiProvider {
     String path,
     Map<String, dynamic> body, {
     bool withAuth = true,
+    Duration timeout = _kTimeout,
   }) async {
     final res = await http
         .post(
@@ -62,7 +63,7 @@ class ApiProvider {
           headers: await _headers(withAuth: withAuth),
           body: jsonEncode(body),
         )
-        .timeout(_kTimeout);
+        .timeout(timeout);
     return _handleResponse(res);
   }
 

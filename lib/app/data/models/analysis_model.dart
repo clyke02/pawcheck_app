@@ -3,6 +3,7 @@ import 'pet_model.dart';
 class AnalysisModel {
   final int id;
   final int? petId;
+  final String? petName;
   final String imageUrl;
   final double weightKg;
   final double ageYears;
@@ -21,6 +22,7 @@ class AnalysisModel {
   AnalysisModel({
     required this.id,
     this.petId,
+    this.petName,
     required this.imageUrl,
     required this.weightKg,
     required this.ageYears,
@@ -40,6 +42,7 @@ class AnalysisModel {
   factory AnalysisModel.fromJson(Map<String, dynamic> json) => AnalysisModel(
         id: json['id'] as int? ?? 0,
         petId: json['pet_id'] as int?,
+        petName: json['pet_name'] as String?,
         imageUrl: json['image_url'] as String? ?? '',
         weightKg:
             double.tryParse(json['weight_kg']?.toString() ?? '') ?? 0.0,

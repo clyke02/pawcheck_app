@@ -77,7 +77,32 @@ class VerifyOtpView extends GetView<VerifyOtpController> {
                   height: 1.5,
                 ),
               ),
-              const SizedBox(height: 36),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF3CD),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFFFE082)),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Color(0xFFF9A825), size: 16),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Tidak menemukan email? Cek folder Spam atau Promosi di Gmail Anda.',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF7A5C00),
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 28),
               Obx(() => Pinput(
                     length: 6,
                     controller: controller.otpCtrl,

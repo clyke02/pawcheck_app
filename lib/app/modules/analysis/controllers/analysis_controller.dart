@@ -13,6 +13,7 @@ class AnalysisController extends GetxController {
   final _picker = ImagePicker();
 
   final selectedImage = Rxn<File>();
+  final petNameCtrl = TextEditingController();
   final weightCtrl = TextEditingController();
   final ageCtrl = TextEditingController();
   final selectedGender = 'male'.obs;
@@ -27,6 +28,7 @@ class AnalysisController extends GetxController {
 
   @override
   void onClose() {
+    petNameCtrl.dispose();
     weightCtrl.dispose();
     ageCtrl.dispose();
     super.onClose();
@@ -96,6 +98,10 @@ class AnalysisController extends GetxController {
 
   Future<void> analyze() async {
     errorMessage('');
+    if (petNameCtrl.text.trim().isEmpty) {
+      errorMessage('Nama hewan wajib diisi.');
+      return;
+    }
     if (selectedImage.value == null) {
       errorMessage('Pilih foto terlebih dahulu.');
       return;
@@ -114,6 +120,7 @@ class AnalysisController extends GetxController {
       isLoading(true);
       final result = await repository.analyze(
         image: selectedImage.value!,
+        petName: petNameCtrl.text.trim(),
         weightKg: weight,
         ageYears: age,
         gender: selectedGender.value,
@@ -122,7 +129,10 @@ class AnalysisController extends GetxController {
         analysisResult.value = result.data;
         predictedBreed.value = result.data?.breedPrediction ?? '';
         confidence.value = result.data?.confidenceScore ?? 0.0;
-        Get.toNamed(Routes.ANALYSIS_RESULT, arguments: result.data);
+        Get.toNamed(Routes.ANALYSIS_RESULT, arguments: {
+          'analysis': result.data,
+          'petName': petNameCtrl.text.trim(),
+        });
       } else {
         errorMessage(result.message ?? 'Analisis gagal.');
       }
@@ -135,6 +145,7 @@ class AnalysisController extends GetxController {
 
   void reset() {
     selectedImage.value = null;
+    petNameCtrl.clear();
     weightCtrl.clear();
     ageCtrl.clear();
     selectedGender.value = 'male';

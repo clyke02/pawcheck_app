@@ -69,6 +69,12 @@ class AnalysisView extends GetView<AnalysisController> {
               ),
               const SizedBox(height: 12),
               PawTextField(
+                controller: controller.petNameCtrl,
+                label: 'Nama Hewan',
+                prefixIcon: Icons.pets_rounded,
+              ),
+              const SizedBox(height: 14),
+              PawTextField(
                 controller: controller.weightCtrl,
                 label: 'Berat (kg)',
                 keyboardType: const TextInputType.numberWithOptions(
