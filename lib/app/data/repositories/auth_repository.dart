@@ -6,7 +6,7 @@ import '../../../core/utils/api_response.dart';
 import '../../../core/utils/constants.dart';
 
 class AuthRepository {
-  Future<ApiResponse<UserModel>> register(
+  Future<ApiResponse<bool>> register(
       String name, String email, String password) async {
     try {
       final res = await ApiProvider.post(
@@ -14,11 +14,7 @@ class AuthRepository {
         {'name': name, 'email': email, 'password': password},
         withAuth: false,
       );
-      final user = UserModel.fromJson(res['user'] as Map<String, dynamic>);
-      final token = res['token'] as String;
-      await _persist(user, token);
-      return ApiResponse.success(user.copyWith(token: token),
-          message: res['message'] as String?);
+      return ApiResponse.success(true, message: res['message'] as String?);
     } on ApiException catch (e) {
       return ApiResponse.error(e.message, statusCode: e.statusCode);
     } catch (e) {
@@ -38,6 +34,40 @@ class AuthRepository {
       await _persist(user, token);
       return ApiResponse.success(user.copyWith(token: token),
           message: res['message'] as String?);
+    } on ApiException catch (e) {
+      return ApiResponse.error(e.message, statusCode: e.statusCode);
+    } catch (e) {
+      return ApiResponse.error('Terjadi kesalahan: ${e.toString()}');
+    }
+  }
+
+  Future<ApiResponse<UserModel>> verifyOtp(String email, String otp) async {
+    try {
+      final res = await ApiProvider.post(
+        '/auth/verify-otp',
+        {'email': email, 'otp': otp},
+        withAuth: false,
+      );
+      final user = UserModel.fromJson(res['user'] as Map<String, dynamic>);
+      final token = res['token'] as String;
+      await _persist(user, token);
+      return ApiResponse.success(user.copyWith(token: token),
+          message: res['message'] as String?);
+    } on ApiException catch (e) {
+      return ApiResponse.error(e.message, statusCode: e.statusCode);
+    } catch (e) {
+      return ApiResponse.error('Terjadi kesalahan: ${e.toString()}');
+    }
+  }
+
+  Future<ApiResponse<bool>> resendOtp(String email) async {
+    try {
+      final res = await ApiProvider.post(
+        '/auth/resend-otp',
+        {'email': email},
+        withAuth: false,
+      );
+      return ApiResponse.success(true, message: res['message'] as String?);
     } on ApiException catch (e) {
       return ApiResponse.error(e.message, statusCode: e.statusCode);
     } catch (e) {

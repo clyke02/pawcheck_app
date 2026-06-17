@@ -4,7 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/utils/constants.dart';
 
-const _kTimeout = Duration(seconds: 15);
+const _kTimeout         = Duration(seconds: 15);
+const _kAnalysisTimeout = Duration(seconds: 90);
 
 class ApiException implements Exception {
   final String message;
@@ -100,7 +101,7 @@ class ApiProvider {
     if (token != null) request.headers['Authorization'] = 'Bearer $token';
     request.fields.addAll(fields);
     request.files.add(await http.MultipartFile.fromPath('image', imageFile.path));
-    final streamed = await request.send().timeout(_kTimeout);
+    final streamed = await request.send().timeout(_kAnalysisTimeout);
     final res = await http.Response.fromStream(streamed);
     return _handleResponse(res);
   }

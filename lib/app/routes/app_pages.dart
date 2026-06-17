@@ -3,6 +3,8 @@ import '../modules/auth/login/bindings/login_binding.dart';
 import '../modules/auth/login/views/login_view.dart';
 import '../modules/auth/register/bindings/register_binding.dart';
 import '../modules/auth/register/views/register_view.dart';
+import '../modules/auth/verify_otp/bindings/verify_otp_binding.dart';
+import '../modules/auth/verify_otp/views/verify_otp_view.dart';
 import '../modules/main/bindings/main_binding.dart';
 import '../modules/main/views/main_view.dart';
 import '../modules/analysis/bindings/analysis_binding.dart';
@@ -15,6 +17,7 @@ import '../modules/pet_detail/views/pet_detail_view.dart';
 abstract class Routes {
   static const LOGIN = '/login';
   static const REGISTER = '/register';
+  static const VERIFY_OTP = '/verify-otp';
   static const MAIN = '/main';
   static const ANALYSIS = '/analysis';
   static const ANALYSIS_RESULT = '/analysis/result';
@@ -34,6 +37,11 @@ class AppPages {
       name: Routes.REGISTER,
       page: () => const RegisterView(),
       binding: RegisterBinding(),
+    ),
+    GetPage(
+      name: Routes.VERIFY_OTP,
+      page: () => const VerifyOtpView(),
+      binding: VerifyOtpBinding(),
     ),
     GetPage(
       name: Routes.MAIN,

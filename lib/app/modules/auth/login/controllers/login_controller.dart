@@ -34,6 +34,8 @@ class LoginController extends GetxController {
       final result = await repository.login(email, password);
       if (result.success) {
         Get.offAllNamed(Routes.MAIN);
+      } else if (result.statusCode == 403) {
+        Get.toNamed(Routes.VERIFY_OTP, arguments: {'email': email});
       } else {
         errorMessage(result.message ?? 'Login gagal.');
       }
