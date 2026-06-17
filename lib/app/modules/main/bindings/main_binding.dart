@@ -8,8 +8,10 @@ import '../controllers/main_controller.dart';
 class MainBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<AuthRepository>(() => AuthRepository());
-    Get.lazyPut<PetRepository>(() => PetRepository());
+    // Permanent singletons — shared across all child routes
+    Get.put<AuthRepository>(AuthRepository(), permanent: true);
+    Get.put<PetRepository>(PetRepository(), permanent: true);
+
     Get.lazyPut<MainController>(() => MainController());
     Get.lazyPut<HomeController>(
       () => HomeController(

@@ -32,29 +32,7 @@ class ResultView extends GetView<AnalysisResultController> {
                       color: Colors.white, size: 20),
                 )
               else
-                const SizedBox(width: 48),
-              const Expanded(
-                child: Text(
-                  'Hasil Analisis',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 17,
-                  ),
-                ),
-              ),
-              if (!isView)
-                TextButton(
-                  onPressed: controller.done,
-                  child: const Text(
-                    'Selesai',
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.w700),
-                  ),
-                )
-              else
-                const SizedBox(width: 48),
+                const SizedBox(height: 48),
             ],
           ),
         ),
@@ -62,65 +40,113 @@ class ResultView extends GetView<AnalysisResultController> {
 
       return Scaffold(
         backgroundColor: const Color(0xFFF0F2F5),
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              BcsScoreCard(
-                heroMode: true,
-                headerWidget: headerWidget,
-                score: result.bcsScore,
-                category: result.bcsCategory,
-                weightKg: result.weightKg,
-                idealWeightUsed: result.idealWeightUsed,
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 16, 32),
+        body: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _RerMerCard(rer: result.rer, mer: result.mer),
-                    const SizedBox(height: 14),
-                    _BreedCard(
-                      breed: result.breedPrediction,
-                      confidence: result.confidencePercent,
+                    BcsScoreCard(
+                      heroMode: true,
+                      headerWidget: headerWidget,
+                      score: result.bcsScore,
+                      category: result.bcsCategory,
+                      weightKg: result.weightKg,
+                      idealWeightUsed: result.idealWeightUsed,
                     ),
-                    const SizedBox(height: 14),
-                    _DetailCard(
-                      ageYears: result.ageYears,
-                      gender: result.gender,
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _RerMerCard(rer: result.rer, mer: result.mer),
+                          const SizedBox(height: 14),
+                          _BreedCard(
+                            breed: result.breedPrediction,
+                            confidence: result.confidencePercent,
+                          ),
+                          const SizedBox(height: 14),
+                          _DetailCard(
+                            ageYears: result.ageYears,
+                            gender: result.gender,
+                          ),
+                          const SizedBox(height: 14),
+                          _NutritionCard(
+                              nutritionRec: result.nutritionRecommendation),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 14),
-                    _NutritionCard(
-                        nutritionRec: result.nutritionRecommendation),
-                    const SizedBox(height: 28),
-                    if (!isView) ...[
-                      Obx(() => PawButton(
-                            label: 'Simpan sebagai Hewan Peliharaan',
-                            onTap: controller.savePet,
-                            isLoading: controller.isSaving.value,
-                            icon: Icons.pets,
-                          )),
-                      const SizedBox(height: 10),
-                      PawButton(
-                        label: 'Analisis Lagi',
-                        isOutlined: true,
-                        onTap: Get.back,
-                      ),
-                    ] else
-                      PawButton(
-                        label: 'Kembali',
-                        isOutlined: true,
-                        onTap: Get.back,
-                      ),
                   ],
                 ),
+              ),
+            ),
+            _BottomActions(controller: controller, isView: isView),
+          ],
+        ),
+      );
+    });
+  }
+}
+
+class _BottomActions extends StatelessWidget {
+  final AnalysisResultController controller;
+  final bool isView;
+  const _BottomActions({required this.controller, required this.isView});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!isView) ...[
+                Obx(() => PawButton(
+                      label: 'Simpan sebagai Hewan Peliharaan',
+                      onTap: controller.savePet,
+                      isLoading: controller.isSaving.value,
+                      icon: Icons.pets,
+                    )),
+                const SizedBox(height: 10),
+              ],
+              Row(
+                children: [
+                  Expanded(
+                    child: PawButton(
+                      label: 'Analisis Lagi',
+                      isOutlined: true,
+                      onTap: controller.analisisLagi,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: PawButton(
+                      label: 'Selesai',
+                      isOutlined: true,
+                      onTap: controller.done,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 }
 

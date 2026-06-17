@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/utils/constants.dart';
+import '../../routes/app_pages.dart';
 
 const _kTimeout         = Duration(seconds: 15);
 const _kAnalysisTimeout = Duration(seconds: 90);
@@ -44,11 +46,23 @@ class ApiProvider {
     throw ApiException(msg.toString(), statusCode: res.statusCode);
   }
 
+  // Wraps _handleResponse with 401 interception — clears session and redirects to login
+  static Future<Map<String, dynamic>> _handleResponseWithAuth(http.Response res) async {
+    if (res.statusCode == 401) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(AppConstants.tokenKey);
+      await prefs.remove(AppConstants.userKey);
+      Get.offAllNamed(Routes.LOGIN);
+      throw ApiException('Sesi telah berakhir. Silakan masuk kembali.', statusCode: 401);
+    }
+    return _handleResponse(res);
+  }
+
   static Future<Map<String, dynamic>> get(String path) async {
     final res = await http
         .get(Uri.parse('${AppConstants.baseUrl}$path'), headers: await _headers())
         .timeout(_kTimeout);
-    return _handleResponse(res);
+    return _handleResponseWithAuth(res);
   }
 
   static Future<Map<String, dynamic>> post(
@@ -64,7 +78,7 @@ class ApiProvider {
           body: jsonEncode(body),
         )
         .timeout(timeout);
-    return _handleResponse(res);
+    return _handleResponseWithAuth(res);
   }
 
   static Future<Map<String, dynamic>> put(
@@ -78,14 +92,14 @@ class ApiProvider {
           body: jsonEncode(body),
         )
         .timeout(_kTimeout);
-    return _handleResponse(res);
+    return _handleResponseWithAuth(res);
   }
 
   static Future<Map<String, dynamic>> delete(String path) async {
     final res = await http
         .delete(Uri.parse('${AppConstants.baseUrl}$path'), headers: await _headers())
         .timeout(_kTimeout);
-    return _handleResponse(res);
+    return _handleResponseWithAuth(res);
   }
 
   static Future<Map<String, dynamic>> postMultipart(
@@ -104,6 +118,6 @@ class ApiProvider {
     request.files.add(await http.MultipartFile.fromPath('image', imageFile.path));
     final streamed = await request.send().timeout(_kAnalysisTimeout);
     final res = await http.Response.fromStream(streamed);
-    return _handleResponse(res);
+    return _handleResponseWithAuth(res);
   }
 }

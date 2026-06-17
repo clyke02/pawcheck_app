@@ -4,79 +4,59 @@ import '../models/user_model.dart';
 import '../providers/api_provider.dart';
 import '../../../core/utils/api_response.dart';
 import '../../../core/utils/constants.dart';
+import '../../../core/utils/repository_helper.dart';
 
-class AuthRepository {
+class AuthRepository with RepositoryHelper {
   Future<ApiResponse<bool>> register(
-      String name, String email, String password) async {
-    try {
-      final res = await ApiProvider.post(
-        '/auth/register',
-        {'name': name, 'email': email, 'password': password},
-        withAuth: false,
-        timeout: const Duration(seconds: 30),
-      );
-      return ApiResponse.success(true, message: res['message'] as String?);
-    } on ApiException catch (e) {
-      return ApiResponse.error(e.message, statusCode: e.statusCode);
-    } catch (e) {
-      return ApiResponse.error('Terjadi kesalahan: ${e.toString()}');
-    }
-  }
+          String name, String email, String password) =>
+      guard(() async {
+        final res = await ApiProvider.post(
+          '/auth/register',
+          {'name': name, 'email': email, 'password': password},
+          withAuth: false,
+          timeout: const Duration(seconds: 30),
+        );
+        return ApiResponse.success(true, message: res['message'] as String?);
+      });
 
-  Future<ApiResponse<UserModel>> login(String email, String password) async {
-    try {
-      final res = await ApiProvider.post(
-        '/auth/login',
-        {'email': email, 'password': password},
-        withAuth: false,
-        timeout: const Duration(seconds: 30),
-      );
-      final user = UserModel.fromJson(res['user'] as Map<String, dynamic>);
-      final token = res['token'] as String;
-      await _persist(user, token);
-      return ApiResponse.success(user.copyWith(token: token),
-          message: res['message'] as String?);
-    } on ApiException catch (e) {
-      return ApiResponse.error(e.message, statusCode: e.statusCode);
-    } catch (e) {
-      return ApiResponse.error('Terjadi kesalahan: ${e.toString()}');
-    }
-  }
+  Future<ApiResponse<UserModel>> login(String email, String password) =>
+      guard(() async {
+        final res = await ApiProvider.post(
+          '/auth/login',
+          {'email': email, 'password': password},
+          withAuth: false,
+          timeout: const Duration(seconds: 30),
+        );
+        final user = UserModel.fromJson(res['user'] as Map<String, dynamic>);
+        final token = res['token'] as String;
+        await _persist(user, token);
+        return ApiResponse.success(user.copyWith(token: token),
+            message: res['message'] as String?);
+      });
 
-  Future<ApiResponse<UserModel>> verifyOtp(String email, String otp) async {
-    try {
-      final res = await ApiProvider.post(
-        '/auth/verify-otp',
-        {'email': email, 'otp': otp},
-        withAuth: false,
-      );
-      final user = UserModel.fromJson(res['user'] as Map<String, dynamic>);
-      final token = res['token'] as String;
-      await _persist(user, token);
-      return ApiResponse.success(user.copyWith(token: token),
-          message: res['message'] as String?);
-    } on ApiException catch (e) {
-      return ApiResponse.error(e.message, statusCode: e.statusCode);
-    } catch (e) {
-      return ApiResponse.error('Terjadi kesalahan: ${e.toString()}');
-    }
-  }
+  Future<ApiResponse<UserModel>> verifyOtp(String email, String otp) =>
+      guard(() async {
+        final res = await ApiProvider.post(
+          '/auth/verify-otp',
+          {'email': email, 'otp': otp},
+          withAuth: false,
+        );
+        final user = UserModel.fromJson(res['user'] as Map<String, dynamic>);
+        final token = res['token'] as String;
+        await _persist(user, token);
+        return ApiResponse.success(user.copyWith(token: token),
+            message: res['message'] as String?);
+      });
 
-  Future<ApiResponse<bool>> resendOtp(String email) async {
-    try {
-      final res = await ApiProvider.post(
-        '/auth/resend-otp',
-        {'email': email},
-        withAuth: false,
-        timeout: const Duration(seconds: 30),
-      );
-      return ApiResponse.success(true, message: res['message'] as String?);
-    } on ApiException catch (e) {
-      return ApiResponse.error(e.message, statusCode: e.statusCode);
-    } catch (e) {
-      return ApiResponse.error('Terjadi kesalahan: ${e.toString()}');
-    }
-  }
+  Future<ApiResponse<bool>> resendOtp(String email) => guard(() async {
+        final res = await ApiProvider.post(
+          '/auth/resend-otp',
+          {'email': email},
+          withAuth: false,
+          timeout: const Duration(seconds: 30),
+        );
+        return ApiResponse.success(true, message: res['message'] as String?);
+      });
 
   Future<ApiResponse<bool>> logout() async {
     try {
@@ -94,8 +74,8 @@ class AuthRepository {
       final token = prefs.getString(AppConstants.tokenKey);
       final userJson = prefs.getString(AppConstants.userKey);
       if (token == null || userJson == null) return (null, null);
-      final user = UserModel.fromJson(
-          jsonDecode(userJson) as Map<String, dynamic>);
+      final user =
+          UserModel.fromJson(jsonDecode(userJson) as Map<String, dynamic>);
       return (user, token);
     } catch (_) {
       return (null, null);

@@ -5,7 +5,9 @@ import '../controllers/verify_otp_controller.dart';
 class VerifyOtpBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<AuthRepository>(() => AuthRepository());
+    if (!Get.isRegistered<AuthRepository>()) {
+      Get.lazyPut<AuthRepository>(() => AuthRepository());
+    }
     Get.lazyPut<VerifyOtpController>(
       () => VerifyOtpController(repository: Get.find()),
     );

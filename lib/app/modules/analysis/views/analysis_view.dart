@@ -1,9 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../widgets/gender_toggle.dart';
 import '../../../widgets/paw_button.dart';
-import '../../../widgets/paw_loading_widget.dart';
 import '../../../widgets/paw_text_field.dart';
 import '../controllers/analysis_controller.dart';
 
@@ -16,8 +16,7 @@ class AnalysisView extends GetView<AnalysisController> {
       backgroundColor: const Color(0xFFF0F2F5),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const PawLoadingWidget(
-              message: 'Sedang menganalisis...\nMohon tunggu sebentar.');
+          return const _AnalysisLoadingWidget();
         }
         return Column(
           children: [
@@ -309,6 +308,149 @@ class _ImagePreview extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _AnalysisLoadingWidget extends StatefulWidget {
+  const _AnalysisLoadingWidget();
+
+  @override
+  State<_AnalysisLoadingWidget> createState() => _AnalysisLoadingWidgetState();
+}
+
+class _AnalysisLoadingWidgetState extends State<_AnalysisLoadingWidget> {
+  static const _stages = [
+    (
+      icon: Icons.image_search_rounded,
+      msg: 'Mengidentifikasi ras hewan...',
+      sub: 'Model AI sedang memproses foto'
+    ),
+    (
+      icon: Icons.monitor_weight_outlined,
+      msg: 'Menghitung skor BCS...',
+      sub: 'Menganalisis kondisi tubuh hewan'
+    ),
+    (
+      icon: Icons.restaurant_rounded,
+      msg: 'Membuat rekomendasi nutrisi...',
+      sub: 'Menunggu respons Gemini AI'
+    ),
+  ];
+
+  int _stage = 0;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (mounted && _stage < _stages.length - 1) {
+        setState(() => _stage++);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final stage = _stages[_stage];
+    return Scaffold(
+      backgroundColor: const Color(0xFFF0F2F5),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 400),
+                transitionBuilder: (child, animation) => ScaleTransition(
+                  scale: animation,
+                  child: FadeTransition(opacity: animation, child: child),
+                ),
+                child: Container(
+                  key: ValueKey(_stage),
+                  width: 88,
+                  height: 88,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [AppColors.primary, AppColors.accent],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(26),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Icon(stage.icon, color: AppColors.textDark, size: 40),
+                ),
+              ),
+              const SizedBox(height: 28),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  _stages.length,
+                  (i) => AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: i == _stage ? 28 : 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: i == _stage
+                          ? AppColors.primary
+                          : AppColors.primary.withValues(alpha: 0.25),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 400),
+                child: Column(
+                  key: ValueKey(_stage),
+                  children: [
+                    Text(
+                      stage.msg,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 17,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      stage.sub,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textMedium,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 36),
+              const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                strokeWidth: 3,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

@@ -39,8 +39,12 @@ class HomeController extends GetxController {
       final result = await petRepository.getPets();
       if (result.success) {
         petsCount.value = result.data?.length ?? 0;
+      } else {
+        errorMessage(result.message ?? 'Gagal memuat data hewan.');
       }
-    } catch (_) {}
+    } catch (_) {
+      errorMessage('Gagal memuat data hewan.');
+    }
   }
 
   Future<void> logout() async {

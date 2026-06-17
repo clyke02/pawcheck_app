@@ -46,6 +46,14 @@ class AnalysisResultController extends GetxController {
 
   bool get isViewMode => analysis.value?.petId != null;
 
+  void analisisLagi() {
+    if (isViewMode) {
+      Get.toNamed(Routes.ANALYSIS);
+    } else {
+      Get.back(); // analysis form masih di stack
+    }
+  }
+
   void done() {
     if (isViewMode) {
       Get.back();

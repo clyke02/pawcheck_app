@@ -13,6 +13,7 @@ class PetDetailController extends GetxController {
   final isLoading = false.obs;
   final errorMessage = ''.obs;
   final dialogErrorMessage = ''.obs;
+  final dialogIsLoading = false.obs;
   final nameCtrl = TextEditingController();
 
   @override
@@ -60,7 +61,7 @@ class PetDetailController extends GetxController {
       return;
     }
     try {
-      isLoading(true);
+      dialogIsLoading(true);
       dialogErrorMessage('');
       final result = await repository.updatePet(pet.value!.id, name);
       if (result.success) {
@@ -73,7 +74,7 @@ class PetDetailController extends GetxController {
     } catch (e) {
       dialogErrorMessage('Gagal mengubah nama, coba lagi.');
     } finally {
-      isLoading(false);
+      dialogIsLoading(false);
     }
   }
 
@@ -293,8 +294,8 @@ class PetDetailController extends GetxController {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: ElevatedButton(
-                      onPressed: updateName,
+                    child: Obx(() => ElevatedButton(
+                      onPressed: dialogIsLoading.value ? null : updateName,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
@@ -304,11 +305,18 @@ class PetDetailController extends GetxController {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
                       ),
-                      child: const Text(
-                        'Simpan',
-                        style: TextStyle(fontWeight: FontWeight.w700),
-                      ),
-                    ),
+                      child: dialogIsLoading.value
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white),
+                            )
+                          : const Text(
+                              'Simpan',
+                              style: TextStyle(fontWeight: FontWeight.w700),
+                            ),
+                    )),
                   ),
                 ],
               ),
