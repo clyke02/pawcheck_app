@@ -26,7 +26,7 @@ class PawButton extends StatelessWidget {
         child: OutlinedButton(
           onPressed: isLoading ? null : onTap,
           style: OutlinedButton.styleFrom(
-            side: const BorderSide(color: AppColors.primary, width: 1.5),
+            side: const BorderSide(color: AppColors.accent, width: 1.5),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16)),
           ),
@@ -42,7 +42,7 @@ class PawButton extends StatelessWidget {
         gradient: isLoading || onTap == null
             ? null
             : const LinearGradient(
-                colors: [AppColors.primary, Color(0xFFFF8E53)],
+                colors: [AppColors.primary, AppColors.accent],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
               ),
@@ -61,7 +61,7 @@ class PawButton extends StatelessWidget {
   }
 
   Widget _child({bool isOutlined = false}) {
-    final textColor = isOutlined ? AppColors.primary : Colors.white;
+    final textColor = isOutlined ? AppColors.accent : AppColors.textDark;
     if (isLoading) {
       return SizedBox(
         width: 22,
@@ -69,7 +69,7 @@ class PawButton extends StatelessWidget {
         child: CircularProgressIndicator(
           strokeWidth: 2.5,
           valueColor: AlwaysStoppedAnimation<Color>(
-              isOutlined ? AppColors.primary : Colors.white),
+              isOutlined ? AppColors.accent : AppColors.textDark),
         ),
       );
     }

@@ -197,7 +197,7 @@ class _PetsHeader extends StatelessWidget {
       width: double.infinity,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFFFF6B6B), Color(0xFFFF9060)],
+          colors: [AppColors.primary, AppColors.accent],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -216,7 +216,7 @@ class _PetsHeader extends StatelessWidget {
                     const Text(
                       'Hewan Peliharaan',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.textDark,
                         fontSize: 24,
                         fontWeight: FontWeight.w800,
                       ),
@@ -226,13 +226,13 @@ class _PetsHeader extends StatelessWidget {
                       children: [
                         Icon(Icons.swipe_left_rounded,
                             size: 12,
-                            color: Colors.white.withValues(alpha: 0.7)),
+                            color: AppColors.textDark.withValues(alpha: 0.5)),
                         const SizedBox(width: 4),
                         Text(
                           'Geser ke kiri untuk hapus',
                           style: TextStyle(
                             fontSize: 11,
-                            color: Colors.white.withValues(alpha: 0.7),
+                            color: AppColors.textDark.withValues(alpha: 0.5),
                           ),
                         ),
                       ],
@@ -245,16 +245,16 @@ class _PetsHeader extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 14, vertical: 7),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: AppColors.textDark.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.35),
+                        color: AppColors.textDark.withValues(alpha: 0.18),
                         width: 1),
                   ),
                   child: Text(
                     '$count hewan',
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: AppColors.textDark,
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                     ),

@@ -109,7 +109,7 @@ class _PetHeroCard extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFFFF6B6B), Color(0xFFFF9060)],
+          colors: [AppColors.primary, AppColors.accent],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -126,20 +126,20 @@ class _PetHeroCard extends StatelessWidget {
                   IconButton(
                     onPressed: Get.back,
                     icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                        color: Colors.white, size: 20),
+                        color: AppColors.textDark, size: 20),
                   ),
                   const Spacer(),
                   IconButton(
                     onPressed: controller.showEditNameDialog,
                     tooltip: 'Ubah Nama',
                     icon: const Icon(Icons.edit_rounded,
-                        color: Colors.white, size: 20),
+                        color: AppColors.textDark, size: 20),
                   ),
                   IconButton(
                     onPressed: controller.deletePet,
                     tooltip: 'Hapus',
                     icon: const Icon(Icons.delete_outline_rounded,
-                        color: Colors.white, size: 20),
+                        color: AppColors.textDark, size: 20),
                   ),
                 ],
               ),
@@ -156,10 +156,10 @@ class _PetHeroCard extends StatelessWidget {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.18),
+                    color: AppColors.textDark.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.35),
+                        color: AppColors.textDark.withValues(alpha: 0.15),
                         width: 1.5),
                   ),
                   child: Center(
@@ -175,7 +175,7 @@ class _PetHeroCard extends StatelessWidget {
                       Text(
                         pet.name,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.textDark,
                           fontSize: 24,
                           fontWeight: FontWeight.w800,
                         ),
@@ -184,7 +184,7 @@ class _PetHeroCard extends StatelessWidget {
                       Text(
                         '${pet.breed?.name ?? 'Unknown'} · ${pet.genderLabel}',
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.8),
+                          color: AppColors.textDark.withValues(alpha: 0.65),
                           fontSize: 13,
                         ),
                       ),
@@ -224,20 +224,20 @@ class _HeroBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
         color: color != null
-            ? color!.withValues(alpha: 0.25)
-            : Colors.white.withValues(alpha: 0.18),
+            ? color!.withValues(alpha: 0.15)
+            : AppColors.textDark.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: color != null
-              ? color!.withValues(alpha: 0.5)
-              : Colors.white.withValues(alpha: 0.35),
+              ? color!.withValues(alpha: 0.4)
+              : AppColors.textDark.withValues(alpha: 0.18),
           width: 1,
         ),
       ),
       child: Text(
         label,
-        style: const TextStyle(
-          color: Colors.white,
+        style: TextStyle(
+          color: color ?? AppColors.textDark,
           fontSize: 11,
           fontWeight: FontWeight.w600,
         ),

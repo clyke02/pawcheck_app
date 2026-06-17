@@ -87,7 +87,7 @@ class _Header extends StatelessWidget {
           height: 36,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [AppColors.primary, Color(0xFFFF8E53)],
+              colors: [AppColors.primary, AppColors.accent],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -161,7 +161,7 @@ class _AnalysisHeroCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 24),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [AppColors.primary, Color(0xFFFF8E53)],
+            colors: [AppColors.primary, AppColors.accent],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -179,13 +179,13 @@ class _AnalysisHeroCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.25),
+                color: AppColors.textDark.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.camera_alt_rounded,
                 size: 56,
-                color: Colors.white,
+                color: AppColors.textDark,
               ),
             ),
             const SizedBox(height: 20),
@@ -194,16 +194,16 @@ class _AnalysisHeroCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w800,
-                color: Colors.white,
+                color: AppColors.textDark,
               ),
             ),
             const SizedBox(height: 6),
-            const Text(
+            Text(
               'Foto hewanmu & cek kondisi\ntubuhnya sekarang',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.white70,
+                color: AppColors.textDark.withValues(alpha: 0.6),
                 height: 1.4,
               ),
             ),
@@ -211,19 +211,21 @@ class _AnalysisHeroCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.textDark.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                    color: AppColors.textDark.withValues(alpha: 0.2)),
               ),
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.play_arrow_rounded,
-                      color: AppColors.primary, size: 20),
+                      color: AppColors.textDark, size: 20),
                   SizedBox(width: 6),
                   Text(
                     'Mulai Analisis',
                     style: TextStyle(
-                      color: AppColors.primary,
+                      color: AppColors.textDark,
                       fontWeight: FontWeight.w700,
                       fontSize: 15,
                     ),

@@ -61,7 +61,7 @@ class _Pill extends StatelessWidget {
           label,
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: isSelected ? Colors.white : AppColors.textDark,
+            color: AppColors.textDark,
             fontWeight: FontWeight.w600,
             fontSize: 14,
           ),

@@ -192,7 +192,7 @@ class _AnalysisHeader extends StatelessWidget {
       width: double.infinity,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.primary, Color(0xFFFF8E53)],
+          colors: [AppColors.primary, AppColors.accent],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -206,7 +206,7 @@ class _AnalysisHeader extends StatelessWidget {
               IconButton(
                 onPressed: Get.back,
                 icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white, size: 20),
+                    color: AppColors.textDark, size: 20),
               ),
               const Expanded(
                 child: Column(
@@ -215,7 +215,7 @@ class _AnalysisHeader extends StatelessWidget {
                     Text(
                       'Analisis BCS',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.textDark,
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
                       ),
@@ -224,7 +224,7 @@ class _AnalysisHeader extends StatelessWidget {
                     Text(
                       'Lengkapi foto & data hewan peliharaanmu',
                       style: TextStyle(
-                        color: Colors.white70,
+                        color: AppColors.textDark,
                         fontSize: 12,
                       ),
                     ),
@@ -326,14 +326,14 @@ class _PhotoPlaceholder extends StatelessWidget {
           height: 64,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [AppColors.primary, Color(0xFFFF8E53)],
+              colors: [AppColors.primary, AppColors.accent],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(18),
           ),
           child: const Icon(Icons.add_a_photo_rounded,
-              color: Colors.white, size: 30),
+              color: AppColors.textDark, size: 30),
         ),
         const SizedBox(height: 14),
         const Text(
