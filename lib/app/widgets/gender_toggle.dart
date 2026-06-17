@@ -15,16 +15,20 @@ class GenderToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _Pill(
-          label: '♂️  Jantan',
-          isSelected: selected == 'male',
-          onTap: () => onChanged('male'),
+        Expanded(
+          child: _Pill(
+            label: '♂️  Jantan',
+            isSelected: selected == 'male',
+            onTap: () => onChanged('male'),
+          ),
         ),
         const SizedBox(width: 12),
-        _Pill(
-          label: '♀️  Betina',
-          isSelected: selected == 'female',
-          onTap: () => onChanged('female'),
+        Expanded(
+          child: _Pill(
+            label: '♀️  Betina',
+            isSelected: selected == 'female',
+            onTap: () => onChanged('female'),
+          ),
         ),
       ],
     );
@@ -55,6 +59,7 @@ class _Pill extends StatelessWidget {
         ),
         child: Text(
           label,
+          textAlign: TextAlign.center,
           style: TextStyle(
             color: isSelected ? Colors.white : AppColors.textDark,
             fontWeight: FontWeight.w600,
