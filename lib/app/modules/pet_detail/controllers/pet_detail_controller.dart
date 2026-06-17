@@ -80,23 +80,87 @@ class PetDetailController extends GetxController {
   Future<void> deletePet() async {
     final petName = pet.value?.name ?? 'Hewan';
     final confirmed = await Get.dialog<bool>(
-      AlertDialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Hapus Hewan?'),
-        content: Text(
-            'Hapus $petName? Semua riwayat analisis juga akan terhapus.'),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(result: false),
-            child: const Text('Batal'),
+      Dialog(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24)),
+        backgroundColor: Colors.white,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 28),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: AppColors.error.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(Icons.delete_outline_rounded,
+                    color: AppColors.error, size: 26),
+              ),
+              const SizedBox(height: 14),
+              const Text(
+                'Hapus Hewan?',
+                style: TextStyle(
+                    fontSize: 18, fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Hapus $petName? Semua riwayat analisis juga akan ikut terhapus dan tidak bisa dikembalikan.',
+                style: const TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textMedium,
+                    height: 1.5),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Get.back(result: false),
+                      style: OutlinedButton.styleFrom(
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        side: const BorderSide(
+                            color: Color(0xFFE0E0E0), width: 1.5),
+                      ),
+                      child: const Text(
+                        'Batal',
+                        style: TextStyle(
+                            color: AppColors.textMedium,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Get.back(result: true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.error,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const Text(
+                        'Hapus',
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Get.back(result: true),
-            child: const Text('Hapus',
-                style: TextStyle(color: AppColors.error)),
-          ),
-        ],
+        ),
       ),
     );
     if (confirmed != true) return;
@@ -120,43 +184,137 @@ class PetDetailController extends GetxController {
     nameCtrl.text = pet.value?.name ?? '';
     dialogErrorMessage('');
     Get.dialog(
-      AlertDialog(
+      Dialog(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20)),
-        title: const Text('Ubah Nama'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameCtrl,
-              decoration: InputDecoration(
-                labelText: 'Nama hewan',
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12)),
-              ),
-              autofocus: true,
-            ),
-            Obx(() {
-              if (dialogErrorMessage.value.isEmpty) return const SizedBox.shrink();
-              return Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text(
-                  dialogErrorMessage.value,
-                  style: const TextStyle(
-                      color: AppColors.error, fontSize: 12),
+            borderRadius: BorderRadius.circular(24)),
+        backgroundColor: Colors.white,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 28),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(16),
                 ),
-              );
-            }),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: Get.back, child: const Text('Batal')),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(minimumSize: const Size(80, 40)),
-            onPressed: updateName,
-            child: const Text('Simpan'),
+                child: const Icon(Icons.edit_rounded,
+                    color: AppColors.primary, size: 26),
+              ),
+              const SizedBox(height: 14),
+              const Text(
+                'Ubah Nama',
+                style: TextStyle(
+                    fontSize: 18, fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Masukkan nama baru untuk hewan peliharaanmu',
+                style: TextStyle(
+                    fontSize: 12, color: AppColors.textMedium),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: nameCtrl,
+                autofocus: true,
+                style: const TextStyle(
+                    fontWeight: FontWeight.w600, fontSize: 15),
+                decoration: InputDecoration(
+                  hintText: 'Nama hewan',
+                  prefixIcon: const Icon(Icons.pets_rounded,
+                      color: AppColors.primary, size: 20),
+                  filled: true,
+                  fillColor: const Color(0xFFF7F7F7),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(
+                        color: Color(0xFFE8E8E8), width: 1.5),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(
+                        color: AppColors.primary, width: 2),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 14),
+                ),
+              ),
+              Obx(() {
+                if (dialogErrorMessage.value.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                return Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.error_outline,
+                          color: AppColors.error, size: 14),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          dialogErrorMessage.value,
+                          style: const TextStyle(
+                              color: AppColors.error, fontSize: 12),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: Get.back,
+                      style: OutlinedButton.styleFrom(
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        side: const BorderSide(
+                            color: Color(0xFFE0E0E0), width: 1.5),
+                      ),
+                      child: const Text(
+                        'Batal',
+                        style: TextStyle(
+                            color: AppColors.textMedium,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: updateName,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const Text(
+                        'Simpan',
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

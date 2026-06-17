@@ -101,36 +101,106 @@ class PetsView extends GetView<PetsController> {
                           child: const Icon(Icons.delete_rounded,
                               color: AppColors.error),
                         ),
-                        confirmDismiss: (_) async {
-                          bool confirmed = false;
-                          await Get.dialog(
-                            AlertDialog(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20)),
-                              title: const Text('Hapus Hewan?'),
-                              content: Text(
-                                  'Hapus ${pet.name}? Semua riwayat analisis juga akan terhapus.'),
-                              actions: [
-                                TextButton(
-                                    onPressed: () {
-                                      confirmed = false;
-                                      Get.back();
-                                    },
-                                    child: const Text('Batal')),
-                                TextButton(
-                                  onPressed: () {
-                                    confirmed = true;
-                                    Get.back();
-                                  },
-                                  child: const Text('Hapus',
-                                      style:
-                                          TextStyle(color: AppColors.error)),
-                                ),
-                              ],
+                        confirmDismiss: (_) => Get.dialog<bool>(
+                          Dialog(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(24)),
+                            backgroundColor: Colors.white,
+                            insetPadding: const EdgeInsets.symmetric(
+                                horizontal: 28),
+                            child: Padding(
+                              padding: const EdgeInsets.all(24),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 52,
+                                    height: 52,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.error
+                                          .withValues(alpha: 0.1),
+                                      borderRadius:
+                                          BorderRadius.circular(16),
+                                    ),
+                                    child: const Icon(
+                                        Icons.delete_outline_rounded,
+                                        color: AppColors.error,
+                                        size: 26),
+                                  ),
+                                  const SizedBox(height: 14),
+                                  const Text(
+                                    'Hapus Hewan?',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w800),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Hapus ${pet.name}? Semua riwayat analisis juga akan ikut terhapus dan tidak bisa dikembalikan.',
+                                    style: const TextStyle(
+                                        fontSize: 13,
+                                        color: AppColors.textMedium,
+                                        height: 1.5),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 24),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: OutlinedButton(
+                                          onPressed: () =>
+                                              Get.back(result: false),
+                                          style: OutlinedButton.styleFrom(
+                                            padding:
+                                                const EdgeInsets.symmetric(
+                                                    vertical: 14),
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        12)),
+                                            side: const BorderSide(
+                                                color: Color(0xFFE0E0E0),
+                                                width: 1.5),
+                                          ),
+                                          child: const Text(
+                                            'Batal',
+                                            style: TextStyle(
+                                                color: AppColors.textMedium,
+                                                fontWeight: FontWeight.w600),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: ElevatedButton(
+                                          onPressed: () =>
+                                              Get.back(result: true),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: AppColors.error,
+                                            foregroundColor: Colors.white,
+                                            elevation: 0,
+                                            padding:
+                                                const EdgeInsets.symmetric(
+                                                    vertical: 14),
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        12)),
+                                          ),
+                                          child: const Text(
+                                            'Hapus',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w700),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
-                          );
-                          return confirmed;
-                        },
+                          ),
+                        ),
                         onDismissed: (_) => controller.deletePet(pet.id),
                         child: PetListCard(
                           pet: pet,
