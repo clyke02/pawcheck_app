@@ -27,13 +27,14 @@ class AnalysisView extends GetView<AnalysisController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Photo card
-                    Obx(() => _PhotoCard(
-                          image: controller.selectedImage.value,
-                          onTap: controller.showImageSourceDialog,
-                        )),
-
-                    const SizedBox(height: 14),
+                    // Photo card (skipped on re-analysis — breed is already known)
+                    if (!controller.isReanalysis) ...[
+                      Obx(() => _PhotoCard(
+                            image: controller.selectedImage.value,
+                            onTap: controller.showImageSourceDialog,
+                          )),
+                      const SizedBox(height: 14),
+                    ],
 
                     // Form card
                     Container(
@@ -75,12 +76,19 @@ class AnalysisView extends GetView<AnalysisController> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                PawTextField(
-                                  controller: controller.petNameCtrl,
-                                  label: 'Nama Hewan',
-                                  prefixIcon: Icons.badge_outlined,
-                                ),
-                                const SizedBox(height: 12),
+                                if (controller.isReanalysis)
+                                  _ReanalysisBanner(
+                                    petName: controller.reanalysisPetName,
+                                    gender: controller.selectedGender.value,
+                                  )
+                                else ...[
+                                  PawTextField(
+                                    controller: controller.petNameCtrl,
+                                    label: 'Nama Hewan',
+                                    prefixIcon: Icons.badge_outlined,
+                                  ),
+                                  const SizedBox(height: 12),
+                                ],
                                 PawTextField(
                                   controller: controller.weightCtrl,
                                   label: 'Berat (kg)',
@@ -98,34 +106,37 @@ class AnalysisView extends GetView<AnalysisController> {
                                           decimal: true),
                                   prefixIcon: Icons.cake_outlined,
                                 ),
-                                const SizedBox(height: 18),
-                                Divider(
-                                    height: 1,
-                                    color: Colors.grey.withValues(alpha: 0.1)),
-                                const SizedBox(height: 16),
-                                Row(
-                                  children: [
-                                    Icon(Icons.wc_rounded,
-                                        size: 16,
-                                        color: AppColors.textMedium
-                                            .withValues(alpha: 0.7)),
-                                    const SizedBox(width: 7),
-                                    const Text(
-                                      'Jenis Kelamin',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          color: AppColors.textMedium,
-                                          fontSize: 13),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                Obx(() => GenderToggle(
-                                      selected:
-                                          controller.selectedGender.value,
-                                      onChanged: (v) =>
-                                          controller.selectedGender.value = v,
-                                    )),
+                                if (!controller.isReanalysis) ...[
+                                  const SizedBox(height: 18),
+                                  Divider(
+                                      height: 1,
+                                      color:
+                                          Colors.grey.withValues(alpha: 0.1)),
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.wc_rounded,
+                                          size: 16,
+                                          color: AppColors.textMedium
+                                              .withValues(alpha: 0.7)),
+                                      const SizedBox(width: 7),
+                                      const Text(
+                                        'Jenis Kelamin',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.textMedium,
+                                            fontSize: 13),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Obx(() => GenderToggle(
+                                        selected:
+                                            controller.selectedGender.value,
+                                        onChanged: (v) => controller
+                                            .selectedGender.value = v,
+                                      )),
+                                ],
                               ],
                             ),
                           ),
@@ -249,6 +260,54 @@ BoxDecoration _cardDeco() => BoxDecoration(
         ),
       ],
     );
+
+class _ReanalysisBanner extends StatelessWidget {
+  final String petName;
+  final String gender;
+  const _ReanalysisBanner({required this.petName, required this.gender});
+
+  @override
+  Widget build(BuildContext context) {
+    final genderLabel = gender == 'male' ? 'Jantan' : 'Betina';
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.25)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.refresh_rounded,
+              color: AppColors.primary, size: 18),
+          const SizedBox(width: 9),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Analisis ulang: $petName',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                      color: AppColors.textDark),
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  'Jenis kelamin $genderLabel mengikuti data hewan',
+                  style: const TextStyle(
+                      fontSize: 11, color: AppColors.textMedium),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class _PhotoCard extends StatelessWidget {
   final dynamic image;

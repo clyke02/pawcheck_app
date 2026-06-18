@@ -36,6 +36,21 @@ class AnalysisRepository with RepositoryHelper {
             message: res['message'] as String?);
       });
 
+  Future<ApiResponse<AnalysisModel>> reanalyze({
+    required int petId,
+    required double weightKg,
+    required double ageYears,
+  }) =>
+      guard(() async {
+        final res = await ApiProvider.post('/pets/$petId/analyses', {
+          'weight_kg': weightKg,
+          'age_years': ageYears,
+        });
+        return ApiResponse.success(
+            AnalysisModel.fromJson(res['data'] as Map<String, dynamic>),
+            message: res['message'] as String?);
+      });
+
   Future<ApiResponse<bool>> deleteAnalysis(int id) => guard(() async {
         final res = await ApiProvider.delete('/analyses/$id');
         return ApiResponse.success(true, message: res['message'] as String?);

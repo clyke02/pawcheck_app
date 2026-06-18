@@ -27,7 +27,7 @@ class ResultView extends GetView<AnalysisResultController> {
             children: [
               if (isView)
                 IconButton(
-                  onPressed: Get.back,
+                  onPressed: controller.done,
                   icon: const Icon(Icons.arrow_back_ios_new_rounded,
                       color: Colors.white, size: 20),
                 )

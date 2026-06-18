@@ -11,6 +11,9 @@ class AnalysisResultController extends GetxController {
   final analysis = Rxn<AnalysisModel>();
   final isSaving = false.obs;
   String _petName = '';
+  int? _reanalysisPetId;
+
+  bool get isReanalysis => _reanalysisPetId != null;
 
   @override
   void onInit() {
@@ -19,6 +22,7 @@ class AnalysisResultController extends GetxController {
     if (arg is Map) {
       analysis.value = arg['analysis'] as AnalysisModel?;
       _petName = arg['petName'] as String? ?? '';
+      _reanalysisPetId = arg['reanalysisPetId'] as int?;
     } else if (arg is AnalysisModel) {
       analysis.value = arg;
     }
@@ -55,7 +59,9 @@ class AnalysisResultController extends GetxController {
   }
 
   void done() {
-    if (isViewMode) {
+    if (isReanalysis) {
+      Get.until((route) => route.settings.name == Routes.PET_DETAIL);
+    } else if (isViewMode) {
       Get.back();
     } else {
       Get.offAllNamed(Routes.MAIN);

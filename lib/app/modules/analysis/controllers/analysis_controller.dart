@@ -26,6 +26,25 @@ class AnalysisController extends GetxController {
   final predictedBreed = ''.obs;
   final confidence = 0.0.obs;
 
+  // Re-analysis: when launched from a pet detail page, the new analysis
+  // is attached to this existing pet instead of creating a new one.
+  int? reanalysisPetId;
+  String reanalysisPetName = '';
+  bool get isReanalysis => reanalysisPetId != null;
+
+  @override
+  void onInit() {
+    super.onInit();
+    final arg = Get.arguments;
+    if (arg is Map && arg['reanalysisPetId'] != null) {
+      reanalysisPetId = arg['reanalysisPetId'] as int;
+      reanalysisPetName = arg['petName'] as String? ?? '';
+      petNameCtrl.text = reanalysisPetName;
+      final gender = arg['gender'] as String?;
+      if (gender != null) selectedGender.value = gender;
+    }
+  }
+
   @override
   void onClose() {
     petNameCtrl.dispose();
@@ -96,8 +115,46 @@ class AnalysisController extends GetxController {
     );
   }
 
+  Future<void> reanalyze() async {
+    errorMessage('');
+    final weight = double.tryParse(weightCtrl.text.trim());
+    final age = double.tryParse(ageCtrl.text.trim());
+    if (weight == null || weight <= 0) {
+      errorMessage('Masukkan berat badan yang valid.');
+      return;
+    }
+    if (age == null || age < 0) {
+      errorMessage('Masukkan usia yang valid.');
+      return;
+    }
+    try {
+      isLoading(true);
+      final result = await repository.reanalyze(
+        petId: reanalysisPetId!,
+        weightKg: weight,
+        ageYears: age,
+      );
+      if (result.success) {
+        Get.toNamed(Routes.ANALYSIS_RESULT, arguments: {
+          'analysis': result.data,
+          'reanalysisPetId': reanalysisPetId,
+        });
+      } else {
+        errorMessage(result.message ?? 'Analisis ulang gagal.');
+      }
+    } catch (e) {
+      errorMessage('Analisis gagal, mohon coba lagi.');
+    } finally {
+      isLoading(false);
+    }
+  }
+
   Future<void> analyze() async {
     errorMessage('');
+    if (isReanalysis) {
+      await reanalyze();
+      return;
+    }
     if (petNameCtrl.text.trim().isEmpty) {
       errorMessage('Nama hewan wajib diisi.');
       return;
@@ -132,6 +189,7 @@ class AnalysisController extends GetxController {
         Get.toNamed(Routes.ANALYSIS_RESULT, arguments: {
           'analysis': result.data,
           'petName': petNameCtrl.text.trim(),
+          'reanalysisPetId': reanalysisPetId,
         });
       } else {
         errorMessage(result.message ?? 'Analisis gagal.');

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../data/models/pet_model.dart';
 import '../../../data/repositories/pet_repository.dart';
+import '../../../routes/app_pages.dart';
 import '../../../widgets/paw_snackbar.dart';
 
 class PetDetailController extends GetxController {
@@ -48,6 +49,18 @@ class PetDetailController extends GetxController {
     } finally {
       isLoading(false);
     }
+  }
+
+  Future<void> analisisUlang() async {
+    final p = pet.value;
+    if (p == null) return;
+    await Get.toNamed(Routes.ANALYSIS, arguments: {
+      'reanalysisPetId': p.id,
+      'petName': p.name,
+      'gender': p.gender,
+    });
+    // Refresh history when returning from the analysis flow.
+    loadPetDetail(p.id);
   }
 
   Future<void> updateName() async {

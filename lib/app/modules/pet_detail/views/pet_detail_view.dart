@@ -5,6 +5,7 @@ import '../../../data/models/pet_model.dart';
 import '../../../routes/app_pages.dart';
 import '../../../widgets/analysis_history_card.dart';
 import '../../../widgets/bcs_score_card.dart';
+import '../../../widgets/paw_button.dart';
 import '../../../widgets/paw_error_widget.dart';
 import '../../../widgets/paw_loading_widget.dart';
 import '../controllers/pet_detail_controller.dart';
@@ -48,6 +49,12 @@ class PetDetailView extends GetView<PetDetailController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    PawButton(
+                      label: 'Analisis Ulang',
+                      icon: Icons.refresh_rounded,
+                      onTap: controller.analisisUlang,
+                    ),
+                    const SizedBox(height: 24),
                     const Text(
                       'Riwayat Analisis',
                       style: TextStyle(
