@@ -3,10 +3,9 @@ import 'pet_model.dart';
 class AnalysisModel {
   final int id;
   final int? petId;
-  final String? petName;
-  final String imageUrl;
   final double weightKg;
   final double ageYears;
+  final String? activityLevel;
   final String gender;
   final String breedPrediction;
   final double confidenceScore;
@@ -22,10 +21,9 @@ class AnalysisModel {
   AnalysisModel({
     required this.id,
     this.petId,
-    this.petName,
-    required this.imageUrl,
     required this.weightKg,
     required this.ageYears,
+    this.activityLevel,
     required this.gender,
     required this.breedPrediction,
     required this.confidenceScore,
@@ -42,12 +40,11 @@ class AnalysisModel {
   factory AnalysisModel.fromJson(Map<String, dynamic> json) => AnalysisModel(
         id: json['id'] as int? ?? 0,
         petId: json['pet_id'] as int?,
-        petName: json['pet_name'] as String?,
-        imageUrl: json['image_url'] as String? ?? '',
         weightKg:
             double.tryParse(json['weight_kg']?.toString() ?? '') ?? 0.0,
         ageYears:
             double.tryParse(json['age_years']?.toString() ?? '') ?? 0.0,
+        activityLevel: json['activity_level'] as String?,
         gender: json['gender'] as String? ?? 'male',
         breedPrediction: json['breed_prediction'] as String? ?? '',
         confidenceScore:
@@ -82,6 +79,15 @@ class AnalysisModel {
       '${(confidenceScore * 100).toStringAsFixed(1)}%';
 
   String get genderLabel => gender == 'male' ? 'Jantan' : 'Betina';
+
+  String get activityLabel {
+    switch (activityLevel) {
+      case 'low': return 'Rendah';
+      case 'high': return 'Tinggi';
+      case 'average': return 'Sedang';
+      default: return '-';
+    }
+  }
 
   String get timeAgo {
     final diff = DateTime.now().difference(createdAt);

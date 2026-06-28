@@ -1,3 +1,4 @@
+import 'dart:io';
 import '../models/pet_model.dart';
 import '../providers/api_provider.dart';
 import '../../../core/utils/api_response.dart';
@@ -18,12 +19,28 @@ class PetRepository with RepositoryHelper {
             PetModel.fromJson(res['data'] as Map<String, dynamic>));
       });
 
-  Future<ApiResponse<PetModel>> createPet(String name, int analysisId) =>
+  /// Create a pet: uploads the photo (for breed prediction) along with the
+  /// pet's fixed attributes. Provide either [birthDate] (yyyy-MM-dd) or
+  /// [ageAtRegistration] (in years).
+  Future<ApiResponse<PetModel>> createPet({
+    required String name,
+    required File image,
+    required String gender,
+    required bool isNeutered,
+    String? birthDate,
+    double? ageAtRegistration,
+  }) =>
       guard(() async {
-        final res = await ApiProvider.post('/pets', {
+        final fields = <String, String>{
           'name': name,
-          'analysis_id': analysisId,
-        });
+          'gender': gender,
+          'is_neutered': isNeutered ? '1' : '0',
+        };
+        if (birthDate != null) fields['birth_date'] = birthDate;
+        if (ageAtRegistration != null) {
+          fields['age_at_registration'] = ageAtRegistration.toString();
+        }
+        final res = await ApiProvider.postMultipart('/pets', fields, image);
         return ApiResponse.success(
             PetModel.fromJson(res['data'] as Map<String, dynamic>),
             message: res['message'] as String?);
