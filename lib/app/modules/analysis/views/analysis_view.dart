@@ -1,8 +1,6 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../widgets/gender_toggle.dart';
 import '../../../widgets/paw_button.dart';
 import '../../../widgets/paw_text_field.dart';
 import '../controllers/analysis_controller.dart';
@@ -13,176 +11,93 @@ class AnalysisView extends GetView<AnalysisController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F2F5),
+      backgroundColor: AppColors.background,
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const _AnalysisLoadingWidget();
+          return const _LoadingView();
         }
         return Column(
           children: [
-            _AnalysisHeader(),
+            _Header(petName: controller.petName),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Photo card (skipped on re-analysis — breed is already known)
-                    if (!controller.isReanalysis) ...[
-                      Obx(() => _PhotoCard(
-                            image: controller.selectedImage.value,
-                            onTap: controller.showImageSourceDialog,
-                          )),
-                      const SizedBox(height: 14),
-                    ],
-
-                    // Form card
                     Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(18),
                       decoration: _cardDeco(),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.fromLTRB(18, 18, 18, 14),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 34,
-                                  height: 34,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primary
-                                        .withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: const Icon(Icons.pets_rounded,
-                                      color: AppColors.primary, size: 17),
-                                ),
-                                const SizedBox(width: 10),
-                                const Text(
-                                  'Data Hewan',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 15),
-                                ),
-                              ],
-                            ),
+                          const _Label(
+                              icon: Icons.monitor_weight_outlined,
+                              text: 'Berat Badan Saat Ini'),
+                          const SizedBox(height: 8),
+                          PawTextField(
+                            controller: controller.weightCtrl,
+                            label: 'Berat (kg)',
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
+                            prefixIcon: Icons.scale_outlined,
                           ),
-                          Divider(
-                              height: 1,
-                              color: Colors.grey.withValues(alpha: 0.1)),
-                          Padding(
-                            padding: const EdgeInsets.all(18),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (controller.isReanalysis)
-                                  _ReanalysisBanner(
-                                    petName: controller.reanalysisPetName,
-                                    gender: controller.selectedGender.value,
-                                  )
-                                else ...[
-                                  PawTextField(
-                                    controller: controller.petNameCtrl,
-                                    label: 'Nama Hewan',
-                                    prefixIcon: Icons.badge_outlined,
+                          const SizedBox(height: 18),
+                          const _Label(
+                              icon: Icons.directions_run_rounded,
+                              text: 'Tingkat Aktivitas Harian'),
+                          const SizedBox(height: 10),
+                          Obx(() => Column(
+                                children: [
+                                  _ActivityTile(
+                                    value: 'low',
+                                    icon: Icons.self_improvement_rounded,
+                                    title: 'Rendah',
+                                    subtitle: 'Kurang dari 30 menit per hari',
+                                    selected:
+                                        controller.activityLevel.value == 'low',
+                                    onTap: () =>
+                                        controller.activityLevel.value = 'low',
                                   ),
-                                  const SizedBox(height: 12),
-                                ],
-                                PawTextField(
-                                  controller: controller.weightCtrl,
-                                  label: 'Berat (kg)',
-                                  keyboardType:
-                                      const TextInputType.numberWithOptions(
-                                          decimal: true),
-                                  prefixIcon: Icons.monitor_weight_outlined,
-                                ),
-                                const SizedBox(height: 12),
-                                PawTextField(
-                                  controller: controller.ageCtrl,
-                                  label: 'Usia (tahun)',
-                                  keyboardType:
-                                      const TextInputType.numberWithOptions(
-                                          decimal: true),
-                                  prefixIcon: Icons.cake_outlined,
-                                ),
-                                if (!controller.isReanalysis) ...[
-                                  const SizedBox(height: 18),
-                                  Divider(
-                                      height: 1,
-                                      color:
-                                          Colors.grey.withValues(alpha: 0.1)),
-                                  const SizedBox(height: 16),
-                                  Row(
-                                    children: [
-                                      Icon(Icons.wc_rounded,
-                                          size: 16,
-                                          color: AppColors.textMedium
-                                              .withValues(alpha: 0.7)),
-                                      const SizedBox(width: 7),
-                                      const Text(
-                                        'Jenis Kelamin',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            color: AppColors.textMedium,
-                                            fontSize: 13),
-                                      ),
-                                    ],
+                                  const SizedBox(height: 8),
+                                  _ActivityTile(
+                                    value: 'average',
+                                    icon: Icons.directions_walk_rounded,
+                                    title: 'Sedang',
+                                    subtitle: '30 menit hingga 1 jam per hari',
+                                    selected: controller.activityLevel.value ==
+                                        'average',
+                                    onTap: () => controller
+                                        .activityLevel.value = 'average',
                                   ),
-                                  const SizedBox(height: 10),
-                                  Obx(() => GenderToggle(
-                                        selected:
-                                            controller.selectedGender.value,
-                                        onChanged: (v) => controller
-                                            .selectedGender.value = v,
-                                      )),
+                                  const SizedBox(height: 8),
+                                  _ActivityTile(
+                                    value: 'high',
+                                    icon: Icons.directions_run_rounded,
+                                    title: 'Tinggi',
+                                    subtitle: 'Lebih dari 1 jam per hari',
+                                    selected: controller.activityLevel.value ==
+                                        'high',
+                                    onTap: () =>
+                                        controller.activityLevel.value = 'high',
+                                  ),
                                 ],
-                              ],
-                            ),
-                          ),
+                              )),
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 14),
-
-                    // Error
                     Obx(() {
                       if (controller.errorMessage.value.isEmpty) {
                         return const SizedBox.shrink();
                       }
-                      return Container(
-                        width: double.infinity,
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 11),
-                        decoration: BoxDecoration(
-                          color: AppColors.error.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                              color: AppColors.error.withValues(alpha: 0.3)),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.error_outline,
-                                color: AppColors.error, size: 16),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                controller.errorMessage.value,
-                                style: const TextStyle(
-                                    color: AppColors.error, fontSize: 13),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
+                      return _ErrorBox(message: controller.errorMessage.value);
                     }),
-
                     PawButton(
                       label: 'Analisis Sekarang',
-                      onTap: controller.analyze,
                       icon: Icons.analytics_rounded,
+                      onTap: controller.analyze,
                     ),
                   ],
                 ),
@@ -195,7 +110,22 @@ class AnalysisView extends GetView<AnalysisController> {
   }
 }
 
-class _AnalysisHeader extends StatelessWidget {
+BoxDecoration _cardDeco() => BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(20),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.055),
+          blurRadius: 14,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    );
+
+class _Header extends StatelessWidget {
+  final String petName;
+  const _Header({required this.petName});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -218,26 +148,22 @@ class _AnalysisHeader extends StatelessWidget {
                 icon: const Icon(Icons.arrow_back_ios_new_rounded,
                     color: AppColors.textDark, size: 20),
               ),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const Text('Analisis Kondisi',
+                        style: TextStyle(
+                            color: AppColors.textDark,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800)),
+                    const SizedBox(height: 2),
                     Text(
-                      'Analisis BCS',
-                      style: TextStyle(
-                        color: AppColors.textDark,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    SizedBox(height: 2),
-                    Text(
-                      'Lengkapi foto & data hewan peliharaanmu',
-                      style: TextStyle(
-                        color: AppColors.textDark,
-                        fontSize: 12,
-                      ),
-                    ),
+                        petName.isEmpty
+                            ? 'Masukkan berat & aktivitas terkini'
+                            : 'untuk $petName',
+                        style: const TextStyle(
+                            color: AppColors.textDark, fontSize: 12)),
                   ],
                 ),
               ),
@@ -249,59 +175,125 @@ class _AnalysisHeader extends StatelessWidget {
   }
 }
 
-BoxDecoration _cardDeco() => BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(20),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.055),
-          blurRadius: 14,
-          offset: const Offset(0, 4),
-        ),
-      ],
-    );
-
-class _ReanalysisBanner extends StatelessWidget {
-  final String petName;
-  final String gender;
-  const _ReanalysisBanner({required this.petName, required this.gender});
+class _Label extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  const _Label({required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) {
-    final genderLabel = gender == 'male' ? 'Jantan' : 'Betina';
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: AppColors.textMedium.withValues(alpha: 0.8)),
+        const SizedBox(width: 7),
+        Text(text,
+            style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                color: AppColors.textMedium,
+                fontSize: 13)),
+      ],
+    );
+  }
+}
+
+class _ActivityTile extends StatelessWidget {
+  final String value;
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final bool selected;
+  final VoidCallback onTap;
+  const _ActivityTile({
+    required this.value,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          color: selected
+              ? AppColors.primary.withValues(alpha: 0.12)
+              : AppColors.secondary.withValues(alpha: 0.18),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: selected ? AppColors.primary : Colors.transparent,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: selected
+                    ? AppColors.primary.withValues(alpha: 0.2)
+                    : Colors.white,
+                borderRadius: BorderRadius.circular(11),
+              ),
+              child: Icon(icon,
+                  size: 19,
+                  color: selected ? AppColors.accent : AppColors.textMedium),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w700, fontSize: 14)),
+                  Text(subtitle,
+                      style: const TextStyle(
+                          fontSize: 11.5, color: AppColors.textMedium)),
+                ],
+              ),
+            ),
+            Icon(
+              selected
+                  ? Icons.radio_button_checked_rounded
+                  : Icons.radio_button_off_rounded,
+              color: selected ? AppColors.accent : AppColors.textLight,
+              size: 20,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ErrorBox extends StatelessWidget {
+  final String message;
+  const _ErrorBox({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.08),
+        color: AppColors.error.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.25)),
+        border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.refresh_rounded,
-              color: AppColors.primary, size: 18),
-          const SizedBox(width: 9),
+          const Icon(Icons.error_outline, color: AppColors.error, size: 16),
+          const SizedBox(width: 8),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Analisis ulang: $petName',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13,
-                      color: AppColors.textDark),
-                ),
-                const SizedBox(height: 1),
-                Text(
-                  'Jenis kelamin $genderLabel mengikuti data hewan',
-                  style: const TextStyle(
-                      fontSize: 11, color: AppColors.textMedium),
-                ),
-              ],
-            ),
+            child: Text(message,
+                style: const TextStyle(color: AppColors.error, fontSize: 13)),
           ),
         ],
       ),
@@ -309,249 +301,50 @@ class _ReanalysisBanner extends StatelessWidget {
   }
 }
 
-class _PhotoCard extends StatelessWidget {
-  final dynamic image;
-  final VoidCallback onTap;
-  const _PhotoCard({required this.image, required this.onTap});
+class _LoadingView extends StatelessWidget {
+  const _LoadingView();
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        height: 200,
-        decoration: _cardDeco(),
-        clipBehavior: Clip.antiAlias,
-        child: image != null
-            ? _ImagePreview(image: image)
-            : const _PhotoPlaceholder(),
-      ),
-    );
-  }
-}
-
-class _ImagePreview extends StatelessWidget {
-  final dynamic image;
-  const _ImagePreview({required this.image});
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        Image.file(image, fit: BoxFit.cover),
-        Positioned(
-          top: 12,
-          right: 12,
-          child: Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.55),
-              borderRadius: BorderRadius.circular(20),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 84,
+              height: 84,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [AppColors.primary, AppColors.accent],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: const Icon(Icons.monitor_heart_rounded,
+                  color: AppColors.textDark, size: 40),
             ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.cameraswitch_rounded,
-                    color: Colors.white, size: 14),
-                SizedBox(width: 5),
-                Text('Ganti Foto',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600)),
-              ],
+            const SizedBox(height: 24),
+            const Text('Menghitung kondisi tubuh...',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                    color: AppColors.textDark)),
+            const SizedBox(height: 6),
+            const Text('Menganalisis BCS, RER, MER & rekomendasi nutrisi',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 13, color: AppColors.textMedium)),
+            const SizedBox(height: 30),
+            const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+              strokeWidth: 3,
             ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _AnalysisLoadingWidget extends StatefulWidget {
-  const _AnalysisLoadingWidget();
-
-  @override
-  State<_AnalysisLoadingWidget> createState() => _AnalysisLoadingWidgetState();
-}
-
-class _AnalysisLoadingWidgetState extends State<_AnalysisLoadingWidget> {
-  static const _stages = [
-    (
-      icon: Icons.image_search_rounded,
-      msg: 'Mengidentifikasi ras hewan...',
-      sub: 'Model AI sedang memproses foto'
-    ),
-    (
-      icon: Icons.monitor_weight_outlined,
-      msg: 'Menghitung skor BCS...',
-      sub: 'Menganalisis kondisi tubuh hewan'
-    ),
-    (
-      icon: Icons.restaurant_rounded,
-      msg: 'Membuat rekomendasi nutrisi...',
-      sub: 'Menunggu respons Gemini AI'
-    ),
-  ];
-
-  int _stage = 0;
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 5), (_) {
-      if (mounted && _stage < _stages.length - 1) {
-        setState(() => _stage++);
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final stage = _stages[_stage];
-    return Scaffold(
-      backgroundColor: const Color(0xFFF0F2F5),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 400),
-                transitionBuilder: (child, animation) => ScaleTransition(
-                  scale: animation,
-                  child: FadeTransition(opacity: animation, child: child),
-                ),
-                child: Container(
-                  key: ValueKey(_stage),
-                  width: 88,
-                  height: 88,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppColors.primary, AppColors.accent],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(26),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.3),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: Icon(stage.icon, color: AppColors.textDark, size: 40),
-                ),
-              ),
-              const SizedBox(height: 28),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  _stages.length,
-                  (i) => AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: i == _stage ? 28 : 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: i == _stage
-                          ? AppColors.primary
-                          : AppColors.primary.withValues(alpha: 0.25),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 400),
-                child: Column(
-                  key: ValueKey(_stage),
-                  children: [
-                    Text(
-                      stage.msg,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 17,
-                        color: AppColors.textDark,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      stage.sub,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: AppColors.textMedium,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 36),
-              const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-                strokeWidth: 3,
-              ),
-            ],
-          ),
+          ],
         ),
       ),
-    );
-  }
-}
-
-class _PhotoPlaceholder extends StatelessWidget {
-  const _PhotoPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppColors.primary, AppColors.accent],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(18),
-          ),
-          child: const Icon(Icons.add_a_photo_rounded,
-              color: AppColors.textDark, size: 30),
-        ),
-        const SizedBox(height: 14),
-        const Text(
-          'Tambah Foto Hewan',
-          style: TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 15,
-              color: AppColors.textDark),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'Ketuk untuk memilih dari kamera atau galeri',
-          style: TextStyle(
-              fontSize: 12,
-              color: AppColors.textMedium.withValues(alpha: 0.8)),
-        ),
-      ],
     );
   }
 }

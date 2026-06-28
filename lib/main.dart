@@ -7,7 +7,7 @@ import 'core/theme/app_theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final (user, _) = await AuthRepository().loadSaved();
-  final initialRoute = user != null ? Routes.MAIN : Routes.LOGIN;
+  final initialRoute = user != null ? Routes.BERANDA : Routes.LOGIN;
   runApp(PawCheckApp(initialRoute: initialRoute));
 }
 

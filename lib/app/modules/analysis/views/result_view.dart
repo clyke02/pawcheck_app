@@ -17,7 +17,6 @@ class ResultView extends GetView<AnalysisResultController> {
       if (result == null) {
         return const Scaffold(body: PawLoadingWidget());
       }
-      final isView = result.petId != null;
 
       final headerWidget = SafeArea(
         bottom: false,
@@ -25,21 +24,18 @@ class ResultView extends GetView<AnalysisResultController> {
           padding: const EdgeInsets.fromLTRB(4, 4, 12, 0),
           child: Row(
             children: [
-              if (isView)
-                IconButton(
-                  onPressed: controller.done,
-                  icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                      color: Colors.white, size: 20),
-                )
-              else
-                const SizedBox(height: 48),
+              IconButton(
+                onPressed: controller.done,
+                icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white, size: 20),
+              ),
             ],
           ),
         ),
       );
 
       return Scaffold(
-        backgroundColor: const Color(0xFFF0F2F5),
+        backgroundColor: AppColors.background,
         body: Column(
           children: [
             Expanded(
@@ -70,6 +66,7 @@ class ResultView extends GetView<AnalysisResultController> {
                           _DetailCard(
                             ageYears: result.ageYears,
                             gender: result.gender,
+                            activity: result.activityLabel,
                           ),
                           const SizedBox(height: 14),
                           _NutritionCard(
@@ -81,7 +78,7 @@ class ResultView extends GetView<AnalysisResultController> {
                 ),
               ),
             ),
-            _BottomActions(controller: controller, isView: isView),
+            _BottomActions(onDone: controller.done),
           ],
         ),
       );
@@ -90,9 +87,8 @@ class ResultView extends GetView<AnalysisResultController> {
 }
 
 class _BottomActions extends StatelessWidget {
-  final AnalysisResultController controller;
-  final bool isView;
-  const _BottomActions({required this.controller, required this.isView});
+  final VoidCallback onDone;
+  const _BottomActions({required this.onDone});
 
   @override
   Widget build(BuildContext context) {
@@ -111,38 +107,10 @@ class _BottomActions extends StatelessWidget {
         top: false,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (!isView) ...[
-                Obx(() => PawButton(
-                      label: 'Simpan sebagai Hewan Peliharaan',
-                      onTap: controller.savePet,
-                      isLoading: controller.isSaving.value,
-                      icon: Icons.pets,
-                    )),
-                const SizedBox(height: 10),
-              ],
-              Row(
-                children: [
-                  Expanded(
-                    child: PawButton(
-                      label: 'Analisis Lagi',
-                      isOutlined: true,
-                      onTap: controller.analisisLagi,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: PawButton(
-                      label: 'Selesai',
-                      isOutlined: true,
-                      onTap: controller.done,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+          child: PawButton(
+            label: 'Selesai',
+            icon: Icons.check_rounded,
+            onTap: onDone,
           ),
         ),
       ),
@@ -188,9 +156,9 @@ class _RerMerCard extends StatelessWidget {
           _EnergyRow(
             icon: Icons.local_fire_department_rounded,
             label: 'MER',
-            subtitle: 'Kebutuhan Energi Harian',
+            subtitle: 'Kebutuhan Kalori Harian',
             value: '${mer.toStringAsFixed(0)} kkal/hari',
-            color: AppColors.primary,
+            color: AppColors.accent,
           ),
         ],
       ),
@@ -269,18 +237,18 @@ class _BreedCard extends StatelessWidget {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.primary.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(Icons.biotech_rounded,
-                color: AppColors.primary, size: 20),
+                color: AppColors.accent, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Prediksi Ras',
+                const Text('Ras',
                     style:
                         TextStyle(fontSize: 11, color: AppColors.textMedium)),
                 Text(breed,
@@ -290,19 +258,16 @@ class _BreedCard extends StatelessWidget {
             ),
           ),
           Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.primary.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Text(
-              confidence,
-              style: const TextStyle(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 12),
-            ),
+            child: Text(confidence,
+                style: const TextStyle(
+                    color: AppColors.accent,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12)),
           ),
         ],
       ),
@@ -313,12 +278,21 @@ class _BreedCard extends StatelessWidget {
 class _DetailCard extends StatelessWidget {
   final double ageYears;
   final String gender;
-  const _DetailCard({required this.ageYears, required this.gender});
+  final String activity;
+  const _DetailCard({
+    required this.ageYears,
+    required this.gender,
+    required this.activity,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final ageLabel =
-        ageYears % 1 == 0 ? '${ageYears.toInt()} tahun' : '$ageYears tahun';
+    final totalMonths = (ageYears * 12).round();
+    final years = totalMonths ~/ 12;
+    final months = totalMonths % 12;
+    final ageLabel = years <= 0
+        ? '$months bln'
+        : (months == 0 ? '$years thn' : '$years thn $months bln');
     final genderLabel = gender == 'male' ? 'Jantan' : 'Betina';
 
     return Container(
@@ -328,31 +302,35 @@ class _DetailCard extends StatelessWidget {
         children: [
           Expanded(
             child: _StatItem(
-              icon: Icons.cake_outlined,
-              label: 'Usia',
-              value: ageLabel,
-            ),
+                icon: Icons.cake_outlined, label: 'Usia', value: ageLabel),
           ),
-          Container(
-              width: 1,
-              height: 44,
-              color: Colors.grey.withValues(alpha: 0.18)),
+          _divider(),
           Expanded(
             child: _StatItem(
               icon: gender == 'male'
                   ? Icons.male_rounded
                   : Icons.female_rounded,
-              label: 'Jenis Kelamin',
+              label: 'Kelamin',
               value: genderLabel,
               iconColor: gender == 'male'
                   ? const Color(0xFF42A5F5)
                   : const Color(0xFFEC407A),
             ),
           ),
+          _divider(),
+          Expanded(
+            child: _StatItem(
+                icon: Icons.directions_run_rounded,
+                label: 'Aktivitas',
+                value: activity),
+          ),
         ],
       ),
     );
   }
+
+  Widget _divider() => Container(
+      width: 1, height: 44, color: Colors.grey.withValues(alpha: 0.18));
 }
 
 class _StatItem extends StatelessWidget {
@@ -372,15 +350,15 @@ class _StatItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(icon, color: iconColor ?? AppColors.primary, size: 22),
+        Icon(icon, color: iconColor ?? AppColors.accent, size: 22),
         const SizedBox(height: 5),
         Text(label,
-            style: const TextStyle(
-                fontSize: 11, color: AppColors.textMedium)),
+            style:
+                const TextStyle(fontSize: 11, color: AppColors.textMedium)),
         const SizedBox(height: 2),
         Text(value,
-            style: const TextStyle(
-                fontWeight: FontWeight.w700, fontSize: 14)),
+            style:
+                const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
       ],
     );
   }
@@ -407,16 +385,15 @@ class _NutritionCard extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: AppColors.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(Icons.restaurant_rounded,
-                    color: AppColors.primary, size: 18),
+                    color: AppColors.accent, size: 18),
               ),
               const SizedBox(width: 10),
               const Text('Rekomendasi Nutrisi',
-                  style: TextStyle(
-                      fontWeight: FontWeight.w700, fontSize: 15)),
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
             ],
           ),
           const SizedBox(height: 14),
@@ -426,11 +403,9 @@ class _NutritionCard extends StatelessWidget {
             data: nutritionRec!,
             styleSheet: MarkdownStyleSheet(
               p: const TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textDark,
-                  height: 1.55),
-              listBullet: const TextStyle(
-                  fontSize: 13, color: AppColors.textDark),
+                  fontSize: 13, color: AppColors.textDark, height: 1.55),
+              listBullet:
+                  const TextStyle(fontSize: 13, color: AppColors.textDark),
             ),
           ),
         ],

@@ -5,8 +5,10 @@ import '../modules/auth/register/bindings/register_binding.dart';
 import '../modules/auth/register/views/register_view.dart';
 import '../modules/auth/verify_otp/bindings/verify_otp_binding.dart';
 import '../modules/auth/verify_otp/views/verify_otp_view.dart';
-import '../modules/main/bindings/main_binding.dart';
-import '../modules/main/views/main_view.dart';
+import '../modules/pets/bindings/pets_binding.dart';
+import '../modules/pets/views/pets_view.dart';
+import '../modules/pet_form/bindings/pet_form_binding.dart';
+import '../modules/pet_form/views/pet_form_view.dart';
 import '../modules/analysis/bindings/analysis_binding.dart';
 import '../modules/analysis/bindings/analysis_result_binding.dart';
 import '../modules/analysis/views/analysis_view.dart';
@@ -18,7 +20,8 @@ abstract class Routes {
   static const LOGIN = '/login';
   static const REGISTER = '/register';
   static const VERIFY_OTP = '/verify-otp';
-  static const MAIN = '/main';
+  static const BERANDA = '/beranda';
+  static const ADD_PET = '/tambah-hewan';
   static const ANALYSIS = '/analysis';
   static const ANALYSIS_RESULT = '/analysis/result';
   static const PET_DETAIL = '/pets/:id';
@@ -44,9 +47,14 @@ class AppPages {
       binding: VerifyOtpBinding(),
     ),
     GetPage(
-      name: Routes.MAIN,
-      page: () => const MainView(),
-      binding: MainBinding(),
+      name: Routes.BERANDA,
+      page: () => const PetsView(),
+      binding: PetsBinding(),
+    ),
+    GetPage(
+      name: Routes.ADD_PET,
+      page: () => const PetFormView(),
+      binding: PetFormBinding(),
     ),
     GetPage(
       name: Routes.ANALYSIS,

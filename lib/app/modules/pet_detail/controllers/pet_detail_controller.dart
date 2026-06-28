@@ -51,13 +51,12 @@ class PetDetailController extends GetxController {
     }
   }
 
-  Future<void> analisisUlang() async {
+  Future<void> analisis() async {
     final p = pet.value;
     if (p == null) return;
     await Get.toNamed(Routes.ANALYSIS, arguments: {
-      'reanalysisPetId': p.id,
+      'petId': p.id,
       'petName': p.name,
-      'gender': p.gender,
     });
     // Refresh history when returning from the analysis flow.
     loadPetDetail(p.id);

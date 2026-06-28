@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/constants.dart';
 import '../../../data/models/pet_model.dart';
 import '../../../routes/app_pages.dart';
 import '../../../widgets/analysis_history_card.dart';
@@ -20,10 +21,8 @@ class PetDetailView extends GetView<PetDetailController> {
 
       if (pet == null && controller.isLoading.value) {
         return const Scaffold(
-          body: PawLoadingWidget(message: 'Memuat detail...'),
-        );
+            body: PawLoadingWidget(message: 'Memuat detail...'));
       }
-
       if (pet == null && controller.errorMessage.value.isNotEmpty) {
         return Scaffold(
           body: SafeArea(
@@ -34,48 +33,38 @@ class PetDetailView extends GetView<PetDetailController> {
           ),
         );
       }
-
       if (pet == null) return const SizedBox.shrink();
 
       return Scaffold(
-        backgroundColor: const Color(0xFFF0F2F5),
+        backgroundColor: AppColors.background,
         body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _PetHeroCard(pet: pet, controller: controller),
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     PawButton(
-                      label: 'Analisis Ulang',
-                      icon: Icons.refresh_rounded,
-                      onTap: controller.analisisUlang,
+                      label: 'Analisis Kondisi',
+                      icon: Icons.monitor_heart_rounded,
+                      onTap: controller.analisis,
                     ),
                     const SizedBox(height: 24),
-                    const Text(
-                      'Riwayat Analisis',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w800, fontSize: 17),
-                    ),
+                    const Text('Riwayat Analisis',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w800, fontSize: 17)),
                     const SizedBox(height: 12),
-                    if (controller.isLoading.value)
-                      const Center(child: PawLoadingWidget())
-                    else if (controller.errorMessage.value.isNotEmpty)
-                      PawErrorWidget(
-                        message: controller.errorMessage.value,
-                        onRetry: () => controller.loadPetDetail(pet.id),
-                      )
-                    else if ((pet.analyses ?? []).isEmpty)
+                    if ((pet.analyses ?? []).isEmpty)
                       const Center(
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 24),
                           child: Text(
-                            'Belum ada riwayat analisis.',
-                            style:
-                                TextStyle(color: AppColors.textMedium),
+                            'Belum ada riwayat analisis.\nLakukan analisis pertama.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: AppColors.textMedium),
                           ),
                         ),
                       )
@@ -87,7 +76,7 @@ class PetDetailView extends GetView<PetDetailController> {
                             analysis: a,
                             onTap: () => Get.toNamed(
                               Routes.ANALYSIS_RESULT,
-                              arguments: a,
+                              arguments: {'analysis': a},
                             ),
                           ),
                         ),
@@ -123,7 +112,6 @@ class _PetHeroCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Navigation row
           SafeArea(
             bottom: false,
             child: Padding(
@@ -152,59 +140,40 @@ class _PetHeroCard extends StatelessWidget {
               ),
             ),
           ),
-
-          // Pet info
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 14, 24, 28),
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 28),
             child: Row(
               children: [
-                // Avatar
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: AppColors.textDark.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                        color: AppColors.textDark.withValues(alpha: 0.15),
-                        width: 1.5),
-                  ),
-                  child: Center(
-                    child: Text(pet.speciesEmoji,
-                        style: const TextStyle(fontSize: 44)),
-                  ),
-                ),
+                _Avatar(pet: pet),
                 const SizedBox(width: 18),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        pet.name,
-                        style: const TextStyle(
-                          color: AppColors.textDark,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
+                      Text(pet.name,
+                          style: const TextStyle(
+                              color: AppColors.textDark,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w800)),
                       const SizedBox(height: 4),
                       Text(
-                        '${pet.breed?.name ?? 'Unknown'} · ${pet.genderLabel}',
-                        style: TextStyle(
-                          color: AppColors.textDark.withValues(alpha: 0.65),
-                          fontSize: 13,
-                        ),
-                      ),
+                          '${pet.breed?.name ?? 'Unknown'} · ${pet.genderLabel}',
+                          style: TextStyle(
+                              color:
+                                  AppColors.textDark.withValues(alpha: 0.7),
+                              fontSize: 13)),
                       const SizedBox(height: 10),
                       Wrap(
                         spacing: 6,
+                        runSpacing: 6,
                         children: [
-                          _HeroBadge(pet.speciesLabel),
+                          _Badge('${pet.speciesLabel} · ${pet.currentAgeLabel}'),
+                          _Badge(pet.neuterLabel),
                           if (latest != null)
-                            _HeroBadge(
+                            _Badge(
                               'BCS ${latest.bcsScore} · ${latest.bcsCategory}',
-                              color: BcsScoreCard.colorForScore(
-                                  latest.bcsScore),
+                              color:
+                                  BcsScoreCard.colorForScore(latest.bcsScore),
                             ),
                         ],
                       ),
@@ -220,10 +189,40 @@ class _PetHeroCard extends StatelessWidget {
   }
 }
 
-class _HeroBadge extends StatelessWidget {
+class _Avatar extends StatelessWidget {
+  final PetModel pet;
+  const _Avatar({required this.pet});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 84,
+      height: 84,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: AppColors.textDark.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+            color: AppColors.textDark.withValues(alpha: 0.15), width: 1.5),
+      ),
+      child: (pet.imageUrl != null && pet.imageUrl!.isNotEmpty)
+          ? Image.network(
+              AppConstants.fileUrl(pet.imageUrl!),
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => _emoji(),
+            )
+          : _emoji(),
+    );
+  }
+
+  Widget _emoji() =>
+      Center(child: Text(pet.speciesEmoji, style: const TextStyle(fontSize: 44)));
+}
+
+class _Badge extends StatelessWidget {
   final String label;
   final Color? color;
-  const _HeroBadge(this.label, {this.color});
+  const _Badge(this.label, {this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -241,14 +240,11 @@ class _HeroBadge extends StatelessWidget {
           width: 1,
         ),
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color ?? AppColors.textDark,
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
+      child: Text(label,
+          style: TextStyle(
+              color: color ?? AppColors.textDark,
+              fontSize: 11,
+              fontWeight: FontWeight.w600)),
     );
   }
 }

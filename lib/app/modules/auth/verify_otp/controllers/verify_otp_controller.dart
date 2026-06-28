@@ -61,7 +61,7 @@ class VerifyOtpController extends GetxController {
       errorMessage('');
       final result = await repository.verifyOtp(email, code);
       if (result.success) {
-        Get.offAllNamed(Routes.MAIN);
+        Get.offAllNamed(Routes.BERANDA);
       } else {
         errorMessage(result.message ?? 'Verifikasi gagal.');
         otpCtrl.clear();

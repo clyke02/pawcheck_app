@@ -20,7 +20,10 @@ class MainBinding extends Bindings {
       ),
     );
     Get.lazyPut<PetsController>(
-      () => PetsController(repository: Get.find()),
+      () => PetsController(
+        petRepository: Get.find(),
+        authRepository: Get.find(),
+      ),
     );
   }
 }

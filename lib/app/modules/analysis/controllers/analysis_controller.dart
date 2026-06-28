@@ -1,8 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
-import '../../../data/models/analysis_model.dart';
 import '../../../data/repositories/analysis_repository.dart';
 import '../../../routes/app_pages.dart';
 
@@ -10,187 +7,49 @@ class AnalysisController extends GetxController {
   final AnalysisRepository repository;
   AnalysisController({required this.repository});
 
-  final _picker = ImagePicker();
+  int petId = 0;
+  String petName = '';
 
-  final selectedImage = Rxn<File>();
-  final petNameCtrl = TextEditingController();
   final weightCtrl = TextEditingController();
-  final ageCtrl = TextEditingController();
-  final selectedGender = 'male'.obs;
+  final activityLevel = 'average'.obs;
 
   final isLoading = false.obs;
-  final isPredicting = false.obs;
   final errorMessage = ''.obs;
-
-  final analysisResult = Rxn<AnalysisModel>();
-  final predictedBreed = ''.obs;
-  final confidence = 0.0.obs;
-
-  // Re-analysis: when launched from a pet detail page, the new analysis
-  // is attached to this existing pet instead of creating a new one.
-  int? reanalysisPetId;
-  String reanalysisPetName = '';
-  bool get isReanalysis => reanalysisPetId != null;
 
   @override
   void onInit() {
     super.onInit();
     final arg = Get.arguments;
-    if (arg is Map && arg['reanalysisPetId'] != null) {
-      reanalysisPetId = arg['reanalysisPetId'] as int;
-      reanalysisPetName = arg['petName'] as String? ?? '';
-      petNameCtrl.text = reanalysisPetName;
-      final gender = arg['gender'] as String?;
-      if (gender != null) selectedGender.value = gender;
+    if (arg is Map) {
+      petId = arg['petId'] as int? ?? 0;
+      petName = arg['petName'] as String? ?? '';
     }
   }
 
   @override
   void onClose() {
-    petNameCtrl.dispose();
     weightCtrl.dispose();
-    ageCtrl.dispose();
     super.onClose();
-  }
-
-  Future<void> pickImage(ImageSource source) async {
-    try {
-      final picked = await _picker.pickImage(
-        source: source,
-        imageQuality: 85,
-        maxWidth: 1080,
-      );
-      if (picked != null) selectedImage.value = File(picked.path);
-    } catch (e) {
-      errorMessage('Gagal membuka foto, coba lagi.');
-    }
-  }
-
-  void showImageSourceDialog() {
-    Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text('Pilih Sumber Foto',
-                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-            const SizedBox(height: 16),
-            ListTile(
-              leading: const Icon(Icons.camera_alt_rounded),
-              title: const Text('Kamera'),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              onTap: () {
-                Get.back();
-                pickImage(ImageSource.camera);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library_rounded),
-              title: const Text('Galeri'),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              onTap: () {
-                Get.back();
-                pickImage(ImageSource.gallery);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> reanalyze() async {
-    errorMessage('');
-    final weight = double.tryParse(weightCtrl.text.trim());
-    final age = double.tryParse(ageCtrl.text.trim());
-    if (weight == null || weight <= 0) {
-      errorMessage('Masukkan berat badan yang valid.');
-      return;
-    }
-    if (age == null || age < 0) {
-      errorMessage('Masukkan usia yang valid.');
-      return;
-    }
-    try {
-      isLoading(true);
-      final result = await repository.reanalyze(
-        petId: reanalysisPetId!,
-        weightKg: weight,
-        ageYears: age,
-      );
-      if (result.success) {
-        Get.toNamed(Routes.ANALYSIS_RESULT, arguments: {
-          'analysis': result.data,
-          'reanalysisPetId': reanalysisPetId,
-        });
-      } else {
-        errorMessage(result.message ?? 'Analisis ulang gagal.');
-      }
-    } catch (e) {
-      errorMessage('Analisis gagal, mohon coba lagi.');
-    } finally {
-      isLoading(false);
-    }
   }
 
   Future<void> analyze() async {
     errorMessage('');
-    if (isReanalysis) {
-      await reanalyze();
-      return;
-    }
-    if (petNameCtrl.text.trim().isEmpty) {
-      errorMessage('Nama hewan wajib diisi.');
-      return;
-    }
-    if (selectedImage.value == null) {
-      errorMessage('Pilih foto terlebih dahulu.');
-      return;
-    }
-    final weight = double.tryParse(weightCtrl.text.trim());
-    final age = double.tryParse(ageCtrl.text.trim());
+    final weight =
+        double.tryParse(weightCtrl.text.trim().replaceAll(',', '.'));
     if (weight == null || weight <= 0) {
       errorMessage('Masukkan berat badan yang valid.');
-      return;
-    }
-    if (age == null || age < 0) {
-      errorMessage('Masukkan usia yang valid.');
       return;
     }
     try {
       isLoading(true);
       final result = await repository.analyze(
-        image: selectedImage.value!,
-        petName: petNameCtrl.text.trim(),
+        petId: petId,
         weightKg: weight,
-        ageYears: age,
-        gender: selectedGender.value,
+        activityLevel: activityLevel.value,
       );
       if (result.success) {
-        analysisResult.value = result.data;
-        predictedBreed.value = result.data?.breedPrediction ?? '';
-        confidence.value = result.data?.confidenceScore ?? 0.0;
-        Get.toNamed(Routes.ANALYSIS_RESULT, arguments: {
-          'analysis': result.data,
-          'petName': petNameCtrl.text.trim(),
-          'reanalysisPetId': reanalysisPetId,
-        });
+        Get.toNamed(Routes.ANALYSIS_RESULT,
+            arguments: {'analysis': result.data});
       } else {
         errorMessage(result.message ?? 'Analisis gagal.');
       }
@@ -199,17 +58,5 @@ class AnalysisController extends GetxController {
     } finally {
       isLoading(false);
     }
-  }
-
-  void reset() {
-    selectedImage.value = null;
-    petNameCtrl.clear();
-    weightCtrl.clear();
-    ageCtrl.clear();
-    selectedGender.value = 'male';
-    analysisResult.value = null;
-    predictedBreed.value = '';
-    confidence.value = 0.0;
-    errorMessage('');
   }
 }

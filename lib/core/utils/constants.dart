@@ -22,4 +22,8 @@ class AppConstants {
 
   static const String tokenKey = 'auth_token';
   static const String userKey = 'auth_user';
+
+  /// Build a full URL to a file served by the backend (e.g. /storage/...).
+  static String fileUrl(String path) =>
+      path.startsWith('http') ? path : '${_resolveBaseUrl()}$path';
 }

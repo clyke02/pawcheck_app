@@ -33,7 +33,7 @@ class LoginController extends GetxController {
       errorMessage('');
       final result = await repository.login(email, password);
       if (result.success) {
-        Get.offAllNamed(Routes.MAIN);
+        Get.offAllNamed(Routes.BERANDA);
       } else if (result.statusCode == 403) {
         Get.toNamed(Routes.VERIFY_OTP, arguments: {'email': email});
       } else {
