@@ -47,10 +47,12 @@ class PetsController extends GetxController {
   }
 
   Future<void> deletePet(int id) async {
+    // Remove immediately so the dismissed item leaves the widget tree without
+    // error; restore the list if the server call fails.
+    pets.removeWhere((p) => p.id == id);
     try {
       final result = await petRepository.deletePet(id);
       if (result.success) {
-        pets.removeWhere((p) => p.id == id);
         PawSnackbar.success('Hewan peliharaan berhasil dihapus.');
       } else {
         PawSnackbar.error(result.message ?? 'Gagal menghapus hewan.');

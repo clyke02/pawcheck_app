@@ -20,11 +20,15 @@ class AnalysisRepository with RepositoryHelper {
     required String activityLevel,
   }) =>
       guard(() async {
-        final res = await ApiProvider.post('/analyses', {
-          'pet_id': petId,
-          'weight_kg': weightKg,
-          'activity_level': activityLevel,
-        });
+        final res = await ApiProvider.post(
+          '/analyses',
+          {
+            'pet_id': petId,
+            'weight_kg': weightKg,
+            'activity_level': activityLevel,
+          },
+          timeout: const Duration(seconds: 90),
+        );
         return ApiResponse.success(
             AnalysisModel.fromJson(res['data'] as Map<String, dynamic>),
             message: res['message'] as String?);

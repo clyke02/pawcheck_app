@@ -170,46 +170,68 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.accent],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 8, 20),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Halo, ${name.isEmpty ? 'Pemilik' : name} 👋',
-                        style: const TextStyle(
-                            color: AppColors.textDark,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w800)),
-                    const SizedBox(height: 2),
-                    Text('Hewan peliharaanmu',
-                        style: TextStyle(
-                            color: AppColors.textDark.withValues(alpha: 0.7),
-                            fontSize: 13)),
-                  ],
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 12, 8, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Brand row
+            Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [AppColors.primary, AppColors.accent],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.pets, color: Colors.white, size: 20),
                 ),
+                const SizedBox(width: 10),
+                const Text(
+                  'PawCheck',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primary,
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  onPressed: onLogout,
+                  icon: const Icon(Icons.logout_rounded),
+                  color: AppColors.textMedium,
+                  tooltip: 'Keluar',
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            // Greeting
+            const Text(
+              'Selamat Datang,',
+              style: TextStyle(
+                fontSize: 14,
+                color: AppColors.textMedium,
+                fontWeight: FontWeight.w500,
               ),
-              IconButton(
-                onPressed: onLogout,
-                tooltip: 'Keluar',
-                icon: const Icon(Icons.logout_rounded,
-                    color: AppColors.textDark, size: 22),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              name.isEmpty ? 'Pengguna' : name,
+              style: const TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textDark,
+                height: 1.1,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
