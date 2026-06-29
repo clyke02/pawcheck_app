@@ -51,36 +51,27 @@ class AnalysisView extends GetView<AnalysisController> {
                           Obx(() => Column(
                                 children: [
                                   _ActivityTile(
-                                    value: 'low',
-                                    icon: Icons.self_improvement_rounded,
-                                    title: 'Rendah',
-                                    subtitle: 'Kurang dari 30 menit per hari',
-                                    selected:
-                                        controller.activityLevel.value == 'low',
-                                    onTap: () =>
-                                        controller.activityLevel.value = 'low',
-                                  ),
-                                  const SizedBox(height: 8),
-                                  _ActivityTile(
-                                    value: 'average',
-                                    icon: Icons.directions_walk_rounded,
-                                    title: 'Sedang',
-                                    subtitle: '30 menit hingga 1 jam per hari',
+                                    value: 'inactive',
+                                    icon: Icons.weekend_rounded,
+                                    title: 'Kurang Aktif',
+                                    subtitle:
+                                        'Di dalam rumah, tidak banyak bergerak',
                                     selected: controller.activityLevel.value ==
-                                        'average',
+                                        'inactive',
                                     onTap: () => controller
-                                        .activityLevel.value = 'average',
+                                        .activityLevel.value = 'inactive',
                                   ),
                                   const SizedBox(height: 8),
                                   _ActivityTile(
-                                    value: 'high',
+                                    value: 'active',
                                     icon: Icons.directions_run_rounded,
-                                    title: 'Tinggi',
-                                    subtitle: 'Lebih dari 1 jam per hari',
+                                    title: 'Aktif',
+                                    subtitle:
+                                        'Rutin bergerak, bermain, atau diajak jalan',
                                     selected: controller.activityLevel.value ==
-                                        'high',
+                                        'active',
                                     onTap: () =>
-                                        controller.activityLevel.value = 'high',
+                                        controller.activityLevel.value = 'active',
                                   ),
                                 ],
                               )),

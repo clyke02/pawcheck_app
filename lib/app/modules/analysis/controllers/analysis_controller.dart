@@ -11,7 +11,7 @@ class AnalysisController extends GetxController {
   String petName = '';
 
   final weightCtrl = TextEditingController();
-  final activityLevel = 'average'.obs;
+  final activityLevel = 'active'.obs;
 
   final isLoading = false.obs;
   final errorMessage = ''.obs;

@@ -82,9 +82,8 @@ class AnalysisModel {
 
   String get activityLabel {
     switch (activityLevel) {
-      case 'low': return 'Rendah';
-      case 'high': return 'Tinggi';
-      case 'average': return 'Sedang';
+      case 'inactive': return 'Kurang Aktif';
+      case 'active': return 'Aktif';
       default: return '-';
     }
   }
